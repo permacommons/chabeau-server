@@ -9,6 +9,6 @@
   },
   "keywords": ["eliza", "chatbot", "openai", "api", "server"],
   "author": "",
-  "license": "ISC",
-  "description": "A simple ELIZA chatbot server with OpenAI-compatible API"
+  "license": "CC0-1.0",
+  "description": "A simple ELIZA chatbot dummy server with OpenAI-compatible API"
 }
