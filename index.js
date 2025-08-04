@@ -322,6 +322,50 @@ class ElizaBot {
       }
     }
 
+    // Check for latency control patterns
+    if (cleanInput === ')))') {
+      requestLatency = 5000; // 5 seconds
+      return "Wow, I'm feeling really sluggish today! I've set my initial request latency to a whopping 5 seconds. This is like waiting for a computer from the 1980s to boot up, or watching paint dry in slow motion. Fun fact: a sloth moves at about 0.24 kilometers per hour, but at this latency, I'm moving slower than even their internet connection would be!";
+    }
+    if (cleanInput === '))') {
+      requestLatency = 2500; // 2.5 seconds
+      return "Feeling a bit sluggish now! I've increased my initial request latency to 2.5 seconds. That's about as long as it takes to brew a cup of tea or read a short poem. Did you know that the average human attention span is about 8 seconds? At this rate, I'm testing the limits of your patience!";
+    }
+    if (cleanInput === ')') {
+      requestLatency = 500; // 0.5 seconds
+      return "Adding a little delay to my responses! I've set my initial request latency to 500 milliseconds. This is about the time it takes for a human to blink their eyes or for a computer to process a simple command. Interestingly, a housefly's nervous system can process visual information in about 30 milliseconds, so I'm still much slower than a fly's reaction time!";
+    }
+    if (cleanInput === '(((') {
+      requestLatency = 50; // back to baseline
+      return "Back to my normal speed! I've reset my initial request latency to the baseline 50 milliseconds. This is about as fast as a human can perceive a delay - any faster and it would feel instantaneous. For comparison, a camera flash typically lasts about 1 millisecond, so I'm still 50 times slower than that!";
+    }
+    if (cleanInput === '((') {
+      if (requestLatency === 5000) {
+        requestLatency = 500;
+        return "Speeding up a bit! I've reduced my initial request latency from 5 seconds to 500 milliseconds. That's like going from a leisurely stroll to a brisk walk. Still perceptibly delayed, but much more responsive than before!";
+      } else if (requestLatency === 2500) {
+        requestLatency = 50;
+        return "Much better! I've reduced my initial request latency from 2.5 seconds to the baseline 50 milliseconds. Now I'm back to feeling snappy and responsive, like a modern computer should be!";
+      } else {
+        requestLatency = 50;
+        return "I'm already at or near baseline latency (50ms)! Can't get much faster than this - it's like trying to make light travel faster!";
+      }
+    }
+    if (cleanInput === '(') {
+      if (requestLatency === 5000) {
+        requestLatency = 2500;
+        return "Feeling a bit more responsive! I've reduced my initial request latency from 5 seconds to 2.5 seconds. That's still quite slow, but at least it's not glacial anymore. Think of it as going from a glacier's movement to a slow river current!";
+      } else if (requestLatency === 2500) {
+        requestLatency = 500;
+        return "Getting faster! I've reduced my initial request latency from 2.5 seconds to 500 milliseconds. This is about as long as it takes to clap your hands once - much more reasonable for a chatbot!";
+      } else if (requestLatency === 500) {
+        requestLatency = 50;
+        return "Back to baseline! I've reduced my initial request latency from 500 milliseconds to the baseline 50 milliseconds. Now I'm responding at a normal, conversational pace!";
+      } else {
+        return "I'm already at baseline latency (50ms)! Can't go any faster than this - I'm already responding as quickly as a human can perceive!";
+      }
+    }
+
     // Check for long response patterns
     if (cleanInput === '!!!') {
       return this.generateLongResponse(3);
@@ -393,6 +437,9 @@ const eliza = new ElizaBot();
 
 // Global streaming speed multiplier (1x = baseline 50 tokens/second)
 let streamingSpeedMultiplier = 1;
+
+// Global request latency in milliseconds (baseline 50ms)
+let requestLatency = 50;
 
 // Helper function to generate streaming response
 function streamResponse(res, content, isStreaming = false) {
@@ -560,66 +607,69 @@ const server = http.createServer((req, res) => {
     });
 
     req.on('end', () => {
-      try {
-        // Check authorization
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-          res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
-            error: {
-              message: "You didn't provide an API key.",
-              type: "invalid_request_error",
-              code: "invalid_api_key"
-            }
-          }));
-          return;
-        }
+      // Add initial request latency
+      setTimeout(() => {
+        try {
+          // Check authorization
+          const authHeader = req.headers.authorization;
+          if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              error: {
+                message: "You didn't provide an API key.",
+                type: "invalid_request_error",
+                code: "invalid_api_key"
+              }
+            }));
+            return;
+          }
 
-        const token = authHeader.substring(7);
-        if (token === 'badtoken') {
-          res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
-            error: {
-              message: "Invalid API key provided.",
-              type: "invalid_request_error",
-              code: "invalid_api_key"
-            }
-          }));
-          return;
-        }
+          const token = authHeader.substring(7);
+          if (token === 'badtoken') {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              error: {
+                message: "Invalid API key provided.",
+                type: "invalid_request_error",
+                code: "invalid_api_key"
+              }
+            }));
+            return;
+          }
 
-        const requestData = JSON.parse(body);
-        const messages = requestData.messages || [];
-        const stream = requestData.stream || false;
+          const requestData = JSON.parse(body);
+          const messages = requestData.messages || [];
+          const stream = requestData.stream || false;
 
-        // Get the last user message
-        const lastMessage = messages.filter(msg => msg.role === 'user').pop();
-        if (!lastMessage) {
+          // Get the last user message
+          const lastMessage = messages.filter(msg => msg.role === 'user').pop();
+          if (!lastMessage) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              error: {
+                message: "No user message found.",
+                type: "invalid_request_error"
+              }
+            }));
+            return;
+          }
+
+          // Generate ELIZA response
+          const elizaResponse = eliza.respond(lastMessage.content);
+
+          // Send response (streaming or non-streaming)
+          streamResponse(res, elizaResponse, stream);
+
+        } catch (error) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             error: {
-              message: "No user message found.",
+              message: "Invalid JSON in request body.",
               type: "invalid_request_error"
             }
           }));
-          return;
         }
-
-        // Generate ELIZA response
-        const elizaResponse = eliza.respond(lastMessage.content);
-
-        // Send response (streaming or non-streaming)
-        streamResponse(res, elizaResponse, stream);
-
-      } catch (error) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          error: {
-            message: "Invalid JSON in request body.",
-            type: "invalid_request_error"
-          }
-        }));
-      }
+      }, requestLatency);
     });
     return;
   }

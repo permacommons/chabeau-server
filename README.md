@@ -192,6 +192,19 @@ For testing streaming performance and UI responsiveness, the server includes spe
 
 These commands provide funny, factual responses while adjusting the global streaming speed for all subsequent requests. Perfect for testing how your chatbot client handles different streaming rates.
 
+### Initial Request Latency Control
+
+For testing how your chatbot client handles varying initial request latencies, the server includes latency control commands:
+
+- **`)`** - Increases initial request latency to 500ms
+- **`))`** - Increases initial request latency to 2.5 seconds
+- **`)))`** - Increases initial request latency to 5 seconds (maximum)
+- **`(`** - Decreases initial request latency by one level (never below baseline)
+- **`((`** - Decreases initial request latency by two levels (never below baseline)
+- **`(((`** - Resets initial request latency to baseline (50ms)
+
+These commands allow you to simulate different network conditions and server response times, which is useful for testing loading states and timeout handling in your chatbot client.
+
 ### Example Testing Commands:
 ```bash
 # Test single long response
@@ -223,6 +236,24 @@ curl -X POST http://localhost:3000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer test-token" \
   -d '{"model": "eliza-1.0", "messages": [{"role": "user", "content": "<<<"}], "stream": false}'
+
+# Set initial request latency to 2.5 seconds
+curl -X POST http://localhost:3000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token" \
+  -d '{"model": "eliza-1.0", "messages": [{"role": "user", "content": "))"}], "stream": false}'
+
+# Test request with high latency
+curl -X POST http://localhost:3000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token" \
+  -d '{"model": "eliza-1.0", "messages": [{"role": "user", "content": "Hello!"}], "stream": false}'
+
+# Reset to baseline latency
+curl -X POST http://localhost:3000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token" \
+  -d '{"model": "eliza-1.0", "messages": [{"role": "user", "content": "((("}], "stream": false}'
 ```
 
 ## Development
