@@ -63,6 +63,14 @@ Server runs on `http://localhost:3000` (set `PORT` environment variable to custo
 
 Perfect for testing "re-generate reply" functionality with varied content.
 
+### Code Block Generation
+- `@` - Single random code block in various programming languages
+- `@@` - Three random code blocks in various programming languages
+- `@@@` - Five random code blocks in various programming languages
+
+Each code block is formatted as a fenced markdown code block with a brief explanation text. Supported languages include Python, SQL, Bash, JavaScript, HTML, CSS, Java, C++, Go, and Rust.
+
+
 ### Streaming Speed Control
 - `>` / `>>` / `>>>` - Increase speed (5x/10x/100x baseline)
 - `<` / `<<` / `<<<` - Decrease speed / reset to baseline (50 tokens/sec)

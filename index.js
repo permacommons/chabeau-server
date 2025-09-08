@@ -278,24 +278,50 @@ class ElizaBot {
   respond(input) {
     const cleanInput = input.trim();
 
-    // Check for speed control patterns first
-    if (cleanInput === '>>>') {
+    // Handle control patterns
+    const controlResponse = this.handleControlPatterns(cleanInput);
+    if (controlResponse) {
+      return controlResponse;
+    }
+
+    // Handle code block generation patterns
+    const codeBlockResponse = this.handleCodeBlockPatterns(cleanInput);
+    if (codeBlockResponse) {
+      return codeBlockResponse;
+    }
+
+    // Handle ELIZA response patterns
+    for (const rule of this.patterns) {
+      const match = cleanInput.match(rule.pattern);
+      if (match) {
+        const response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+        return this.substitute(response, match);
+      }
+    }
+
+    // Return default response if no patterns match
+    return this.defaultResponses[Math.floor(Math.random() * this.defaultResponses.length)];
+  }
+
+  handleControlPatterns(input) {
+    // Speed control patterns
+    if (input === '>>>') {
       streamingSpeedMultiplier = 100;
       return "Whoa there, speed demon! I've cranked my response rate up to 100x baseline (that's 5,000 tokens per second). At this rate, I could recite the entire works of Shakespeare in about 3 seconds. Fun fact: hummingbirds flap their wings at about 80 beats per second, which is still slower than my current token rate!";
     }
-    if (cleanInput === '>>') {
+    if (input === '>>') {
       streamingSpeedMultiplier = 10;
       return "Alright, shifting into high gear! I'm now streaming at 10x baseline speed (500 tokens per second). That's roughly equivalent to the typing speed of a very caffeinated court stenographer or a woodpecker hammering away at a particularly stubborn tree. Did you know that the fastest human typists can reach about 200 words per minute? I'm currently doing about 6,000 words per minute!";
     }
-    if (cleanInput === '>') {
+    if (input === '>') {
       streamingSpeedMultiplier = 5;
       return "Picking up the pace! I'm now streaming at 5x baseline speed (250 tokens per second). This is about as fast as an auctioneer on a good day, or roughly the speed at which a hummingbird's heart beats. Interestingly, this is also approximately the rate at which neurons fire in your brain when you're really concentrating!";
     }
-    if (cleanInput === '<<<') {
+    if (input === '<<<') {
       streamingSpeedMultiplier = 1;
       return "Ahh, back to baseline! I'm now streaming at my normal, leisurely pace of 50 tokens per second. This is roughly the speed of a comfortable conversation, about as fast as you might read aloud to a child, or the rate at which a sloth moves when it's really motivated. Sometimes slow and steady really does win the race!";
     }
-    if (cleanInput === '<<') {
+    if (input === '<<') {
       if (streamingSpeedMultiplier === 100) {
         streamingSpeedMultiplier = 5;
         return "Stepping down two gears from ludicrous speed! I'm now at 5x baseline (250 tokens per second). That's like going from a Formula 1 race car to a speedy bicycle. Still fast enough to make a cheetah jealous, but slow enough that you won't get whiplash from my responses!";
@@ -307,7 +333,7 @@ class ElizaBot {
         return "Already at or near baseline speed! I'm cruising at my standard 50 tokens per second. This is the Goldilocks zone of streaming - not too fast, not too slow, but just right for a pleasant conversation!";
       }
     }
-    if (cleanInput === '<') {
+    if (input === '<') {
       if (streamingSpeedMultiplier === 100) {
         streamingSpeedMultiplier = 10;
         return "Easing off the gas pedal! Down from warp speed to 10x baseline (500 tokens per second). That's like going from a rocket ship to a very fast sports car. Still impressively quick, but now you might actually be able to follow along without getting dizzy!";
@@ -322,24 +348,24 @@ class ElizaBot {
       }
     }
 
-    // Check for latency control patterns
-    if (cleanInput === ')))') {
+    // Latency control patterns
+    if (input === ')))') {
       requestLatency = 5000; // 5 seconds
       return "Wow, I'm feeling really sluggish today! I've set my initial request latency to a whopping 5 seconds. This is like waiting for a computer from the 1980s to boot up, or watching paint dry in slow motion. Fun fact: a sloth moves at about 0.24 kilometers per hour, but at this latency, I'm moving slower than even their internet connection would be!";
     }
-    if (cleanInput === '))') {
+    if (input === '))') {
       requestLatency = 2500; // 2.5 seconds
       return "Feeling a bit sluggish now! I've increased my initial request latency to 2.5 seconds. That's about as long as it takes to brew a cup of tea or read a short poem. Did you know that the average human attention span is about 8 seconds? At this rate, I'm testing the limits of your patience!";
     }
-    if (cleanInput === ')') {
+    if (input === ')') {
       requestLatency = 500; // 0.5 seconds
       return "Adding a little delay to my responses! I've set my initial request latency to 500 milliseconds. This is about the time it takes for a human to blink their eyes or for a computer to process a simple command. Interestingly, a housefly's nervous system can process visual information in about 30 milliseconds, so I'm still much slower than a fly's reaction time!";
     }
-    if (cleanInput === '(((') {
+    if (input === '(((') {
       requestLatency = 50; // back to baseline
       return "Back to my normal speed! I've reset my initial request latency to the baseline 50 milliseconds. This is about as fast as a human can perceive a delay - any faster and it would feel instantaneous. For comparison, a camera flash typically lasts about 1 millisecond, so I'm still 50 times slower than that!";
     }
-    if (cleanInput === '((') {
+    if (input === '((') {
       if (requestLatency === 5000) {
         requestLatency = 500;
         return "Speeding up a bit! I've reduced my initial request latency from 5 seconds to 500 milliseconds. That's like going from a leisurely stroll to a brisk walk. Still perceptibly delayed, but much more responsive than before!";
@@ -351,7 +377,7 @@ class ElizaBot {
         return "I'm already at or near baseline latency (50ms)! Can't get much faster than this - it's like trying to make light travel faster!";
       }
     }
-    if (cleanInput === '(') {
+    if (input === '(') {
       if (requestLatency === 5000) {
         requestLatency = 2500;
         return "Feeling a bit more responsive! I've reduced my initial request latency from 5 seconds to 2.5 seconds. That's still quite slow, but at least it's not glacial anymore. Think of it as going from a glacier's movement to a slow river current!";
@@ -366,26 +392,120 @@ class ElizaBot {
       }
     }
 
-    // Check for long response patterns
-    if (cleanInput === '!!!') {
+    // Long response patterns
+    if (input === '!!!') {
       return this.generateLongResponse(3);
     }
-    if (cleanInput === '!!') {
+    if (input === '!!') {
       return this.generateLongResponse(2);
     }
-    if (cleanInput === '!') {
+    if (input === '!') {
       return this.generateLongResponse(1);
     }
 
-    for (const rule of this.patterns) {
-      const match = cleanInput.match(rule.pattern);
-      if (match) {
-        const response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
-        return this.substitute(response, match);
+    // No control pattern matched
+    return null;
+  }
+
+  handleCodeBlockPatterns(input) {
+    // Code block generation patterns
+    if (input === '@@@') {
+      return this.generateCodeBlocks(5);
+    }
+    if (input === '@@') {
+      return this.generateCodeBlocks(3);
+    }
+    if (input === '@') {
+      return this.generateCodeBlocks(1);
+    }
+
+    // No code block pattern matched
+    return null;
+  }
+
+  generateCodeBlocks(count) {
+    const languages = [
+      { name: "Python", extension: "py" },
+      { name: "SQL", extension: "sql" },
+      { name: "Bash", extension: "sh" },
+      { name: "JavaScript", extension: "js" },
+      { name: "HTML", extension: "html" },
+      { name: "CSS", extension: "css" },
+      { name: "Java", extension: "java" },
+      { name: "C++", extension: "cpp" },
+      { name: "Go", extension: "go" },
+      { name: "Rust", extension: "rs" }
+    ];
+
+    const codeSamples = {
+      py: [
+        "def fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\n# Generate first 10 Fibonacci numbers\nfor i in range(10):\n    print(fibonacci(i))",
+        "import requests\nimport json\n\ndef fetch_data(url):\n    response = requests.get(url)\n    if response.status_code == 200:\n        return response.json()\n    else:\n        return None\n\n# Example usage\ndata = fetch_data('https://api.example.com/data')\nif data:\n    print(json.dumps(data, indent=2))\nelse:\n    print('Failed to fetch data')",
+        "class Animal:\n    def __init__(self, name, species):\n        self.name = name\n        self.species = species\n    \n    def make_sound(self):\n        pass\n\nclass Dog(Animal):\n    def make_sound(self):\n        return f'{self.name} says Woof!'\n\nclass Cat(Animal):\n    def make_sound(self):\n        return f'{self.name} says Meow!'\n\n# Create instances\nmy_dog = Dog('Buddy', 'Canine')\nmy_cat = Cat('Whiskers', 'Feline')\n\nprint(my_dog.make_sound())\nprint(my_cat.make_sound())"
+      ],
+      sql: [
+        "SELECT customers.name, orders.order_date, products.product_name\nFROM customers\nJOIN orders ON customers.id = orders.customer_id\nJOIN order_items ON orders.id = order_items.order_id\nJOIN products ON order_items.product_id = products.id\nWHERE orders.order_date > '2023-01-01'\nORDER BY orders.order_date DESC;",
+        "WITH RECURSIVE category_tree AS (\n  SELECT id, name, parent_id, 1 as level\n  FROM categories\n  WHERE parent_id IS NULL\n  \n  UNION ALL\n  \n  SELECT c.id, c.name, c.parent_id, ct.level + 1\n  FROM categories c\n  JOIN category_tree ct ON c.parent_id = ct.id\n)\nSELECT name, level\nFROM category_tree\nORDER BY level, name;",
+        "CREATE INDEX idx_user_email ON users(email);\n\nALTER TABLE orders\nADD CONSTRAINT chk_order_total\nCHECK (total_amount >= 0);\n\nCREATE VIEW customer_order_summary AS\nSELECT \n  c.name,\n  COUNT(o.id) as total_orders,\n  SUM(o.total_amount) as total_spent\nFROM customers c\nLEFT JOIN orders o ON c.id = o.customer_id\nGROUP BY c.id, c.name;"
+      ],
+      sh: [
+        "#!/bin/bash\n\n# Function to check if a directory exists\ncheck_directory() {\n  if [ -d \"$1\" ]; then\n    echo \"Directory $1 exists\"\n  else\n    echo \"Directory $1 does not exist\"\n  fi\n}\n\n# Main script\nfor dir in \"$@\"; do\n  check_directory \"$dir\"\ndone",
+        "#!/bin/bash\n\n# Backup script\nSOURCE_DIR=\"/home/user/documents\"\nBACKUP_DIR=\"/backup/documents\"\nDATE=$(date +%Y%m%d)\n\n# Create backup directory if it doesn't exist\nmkdir -p \"$BACKUP_DIR/$DATE\"\n\n# Copy files\nrsync -av \"$SOURCE_DIR/\" \"$BACKUP_DIR/$DATE/\"\n\n# Remove backups older than 30 days\nfind \"$BACKUP_DIR\" -type d -mtime +30 -exec rm -rf {} +",
+        "#!/bin/bash\n\n# System monitoring script\nCPU_USAGE=$(top -bn1 | grep \"Cpu(s)\" | awk '{print $2}' | cut -d'%' -f1)\nMEMORY_USAGE=$(free | grep Mem | awk '{printf \"%.2f\", $3/$2 * 100.0}')\nDISK_USAGE=$(df -h / | awk 'NR==2 {print $5}' | cut -d'%' -f1)\n\nif [ \"$CPU_USAGE\" -gt 80 ]; then\n  echo \"Warning: High CPU usage - $CPU_USAGE%\"\nfi\n\nif [ \"$MEMORY_USAGE\" -gt 80 ]; then\n  echo \"Warning: High memory usage - $MEMORY_USAGE%\"\nfi\n\nif [ \"$DISK_USAGE\" -gt 80 ]; then\n  echo \"Warning: High disk usage - $DISK_USAGE%\"\nfi"
+      ],
+      js: [
+        "const fetchData = async (url) => {\n  try {\n    const response = await fetch(url);\n    const data = await response.json();\n    return data;\n  } catch (error) {\n    console.error('Error fetching data:', error);\n    return null;\n  }\n};\n\n// Usage\nfetchData('https://api.example.com/data')\n  .then(result => {\n    if (result) {\n      console.log('Data received:', result);\n    } else {\n      console.log('Failed to fetch data');\n    }\n  });",
+        "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  \n  on(event, callback) {\n    if (!this.events[event]) {\n      this.events[event] = [];\n    }\n    this.events[event].push(callback);\n  }\n  \n  emit(event, data) {\n    if (this.events[event]) {\n      this.events[event].forEach(callback => callback(data));\n    }\n  }\n}\n\n// Usage\nconst emitter = new EventEmitter();\nemitter.on('dataReceived', (data) => console.log('Received:', data));\nemitter.emit('dataReceived', { message: 'Hello World' });",
+        "const debounce = (func, delay) => {\n  let timeoutId;\n  return (...args) => {\n    clearTimeout(timeoutId);\n    timeoutId = setTimeout(() => func(...args), delay);\n  };\n};\n\nconst throttle = (func, limit) => {\n  let inThrottle;\n  return (...args) => {\n    if (!inThrottle) {\n      func(...args);\n      inThrottle = true;\n      setTimeout(() => inThrottle = false, limit);\n    }\n  };\n};"
+      ],
+      html: [
+        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Responsive Grid</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"grid\">\n      <div class=\"card\">Card 1</div>\n      <div class=\"card\">Card 2</div>\n      <div class=\"card\">Card 3</div>\n      <div class=\"card\">Card 4</div>\n    </div>\n  </div>\n</body>\n</html>",
+        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"description\" content=\"A simple form example\">\n  <title>Form Validation</title>\n</head>\n<body>\n  <form id=\"userForm\" novalidate>\n    <div>\n      <label for=\"email\">Email:</label>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n      <span class=\"error\" id=\"emailError\"></span>\n    </div>\n    <div>\n      <label for=\"password\">Password:</label>\n      <input type=\"password\" id=\"password\" name=\"password\" required>\n      <span class=\"error\" id=\"passwordError\"></span>\n    </div>\n    <button type=\"submit\">Submit</button>\n  </form>\n  <script src=\"validate.js\"></script>\n</body>\n</html>",
+        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"theme-color\" content=\"#317EFB\">\n  <title>Progressive Web App</title>\n  <link rel=\"manifest\" href=\"manifest.json\">\n</head>\n<body>\n  <header>\n    <nav>\n      <ul>\n        <li><a href=\"#\">Home</a></li>\n        <li><a href=\"#\">About</a></li>\n        <li><a href=\"#\">Contact</a></li>\n      </ul>\n    </nav>\n  </header>\n  <main>\n    <section id=\"content\">\n      <!-- Dynamic content will be loaded here -->\n    </section>\n  </main>\n  <script src=\"app.js\"></script>\n</body>\n</html>"
+      ],
+      css: [
+        ".grid-container {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n  grid-gap: 20px;\n  padding: 20px;\n}\n\n.card {\n  background: #f5f5f5;\n  border-radius: 8px;\n  padding: 20px;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n  transition: transform 0.3s ease;\n}\n\n.card:hover {\n  transform: translateY(-5px);\n  box-shadow: 0 4px 8px rgba(0,0,0,0.15);\n}",
+        "@keyframes fadeIn {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n.fade-in-element {\n  animation: fadeIn 0.5s ease-out forwards;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .fade-in-element {\n    animation: none;\n    opacity: 1;\n  }\n}",
+        ".dark-mode {\n  --bg-color: #1a1a1a;\n  --text-color: #ffffff;\n  --accent-color: #4da6ff;\n}\n\n.light-mode {\n  --bg-color: #ffffff;\n  --text-color: #333333;\n  --accent-color: #0066cc;\n}\n\nbody {\n  background-color: var(--bg-color);\n  color: var(--text-color);\n  transition: background-color 0.3s, color 0.3s;\n}"
+      ],
+      java: [
+        "import java.util.*;\n\npublic class Graph {\n  private Map<Integer, List<Integer>> adjacencyList;\n  \n  public Graph() {\n    adjacencyList = new HashMap<>();\n  }\n  \n  public void addEdge(int source, int destination) {\n    adjacencyList.computeIfAbsent(source, k -> new ArrayList<>()).add(destination);\n    adjacencyList.computeIfAbsent(destination, k -> new ArrayList<>()).add(source);\n  }\n  \n  public List<Integer> getNeighbors(int vertex) {\n    return adjacencyList.getOrDefault(vertex, new ArrayList<>());\n  }\n}",
+        "import java.util.concurrent.*;\n\npublic class ThreadPoolExample {\n  public static void main(String[] args) {\n    ExecutorService executor = Executors.newFixedThreadPool(4);\n    \n    for (int i = 0; i < 10; i++) {\n      final int taskId = i;\n      executor.submit(() -> {\n        System.out.println(\"Task \" + taskId + \" executed by \" + \n                          Thread.currentThread().getName());\n      });\n    }\n    \n    executor.shutdown();\n    try {\n      if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {\n        executor.shutdownNow();\n      }\n    } catch (InterruptedException e) {\n      executor.shutdownNow();\n    }\n  }\n}",
+        "import java.util.*;\n\npublic class LRUCache<K, V> extends LinkedHashMap<K, V> {\n  private final int capacity;\n  \n  public LRUCache(int capacity) {\n    // AccessOrder = true for LRU behavior\n    super(capacity, 0.75f, true);\n    this.capacity = capacity;\n  }\n  \n  @Override\n  protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {\n    return size() > capacity;\n  }\n  \n  public static void main(String[] args) {\n    LRUCache<Integer, String> cache = new LRUCache<>(3);\n    cache.put(1, \"One\");\n    cache.put(2, \"Two\");\n    cache.put(3, \"Three\");\n    cache.get(1); // Accessing key 1\n    cache.put(4, \"Four\"); // This will remove key 2\n    \n    System.out.println(cache); // {1=One, 3=Three, 4=Four}\n  }\n}"
+      ],
+      cpp: [
+        "#include <iostream>\n#include <vector>\n#include <algorithm>\n\ntemplate<typename T>\nclass CircularBuffer {\nprivate:\n  std::vector<T> buffer;\n  size_t head, tail, count, capacity;\n\npublic:\n  CircularBuffer(size_t size) : buffer(size), head(0), tail(0), count(0), capacity(size) {}\n  \n  void push(const T& item) {\n    buffer[tail] = item;\n    tail = (tail + 1) % capacity;\n    if (count == capacity) {\n      head = (head + 1) % capacity;\n    } else {\n      count++;\n    }\n  }\n  \n  T pop() {\n    if (count == 0) throw std::runtime_error(\"Buffer is empty\");\n    T item = buffer[head];\n    head = (head + 1) % capacity;\n    count--;\n    return item;\n  }\n};",
+        "#include <iostream>\n#include <memory>\n\nclass Shape {\npublic:\n  virtual ~Shape() = default;\n  virtual double area() const = 0;\n  virtual void draw() const = 0;\n};\n\nclass Circle : public Shape {\nprivate:\n  double radius;\npublic:\n  Circle(double r) : radius(r) {}\n  double area() const override { return 3.14159 * radius * radius; }\n  void draw() const override { std::cout << \"Drawing a circle\\n\"; }\n};\n\nclass Rectangle : public Shape {\nprivate:\n  double width, height;\npublic:\n  Rectangle(double w, double h) : width(w), height(h) {}\n  double area() const override { return width * height; }\n  void draw() const override { std::cout << \"Drawing a rectangle\\n\"; }\n};\n\nint main() {\n  std::vector<std::unique_ptr<Shape>> shapes;\n  shapes.push_back(std::make_unique<Circle>(5.0));\n  shapes.push_back(std::make_unique<Rectangle>(4.0, 6.0));\n  \n  for (const auto& shape : shapes) {\n    shape->draw();\n    std::cout << \"Area: \" << shape->area() << \"\\n\\n\";\n  }\n  \n  return 0;\n}",
+        "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <condition_variable>\n#include <queue>\n\nclass ThreadSafeQueue {\nprivate:\n  std::queue<int> q;\n  std::mutex mtx;\n  std::condition_variable cv;\n\npublic:\n  void push(int value) {\n    std::lock_guard<std::mutex> lock(mtx);\n    q.push(value);\n    cv.notify_one();\n  }\n  \n  int pop() {\n    std::unique_lock<std::mutex> lock(mtx);\n    cv.wait(lock, [this] { return !q.empty(); });\n    int value = q.front();\n    q.pop();\n    return value;\n  }\n};"
+      ],
+      go: [
+        "package main\n\nimport (\n  \"fmt\"\n  \"sync\"\n  \"time\"\n)\n\nfunc producer(wg *sync.WaitGroup, ch chan<- int) {\n  defer wg.Done()\n  for i := 0; i < 5; i++ {\n    ch <- i\n    time.Sleep(time.Millisecond * 100)\n  }\n  close(ch)\n}\n\nfunc consumer(wg *sync.WaitGroup, ch <-chan int) {\n  defer wg.Done()\n  for value := range ch {\n    fmt.Printf(\"Consumed: %d\\n\", value)\n  }\n}\n\nfunc main() {\n  var wg sync.WaitGroup\n  ch := make(chan int, 2)\n  \n  wg.Add(2)\n  go producer(&wg, ch)\n  go consumer(&wg, ch)\n  \n  wg.Wait()\n}",
+        "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"log\"\n)\n\nfunc handler(w http.ResponseWriter, r *http.Request) {\n  fmt.Fprintf(w, \"Hello, World! Request path: %s\", r.URL.Path)\n}\n\nfunc main() {\n  http.HandleFunc(\"/\", handler)\n  log.Println(\"Server starting on port 8080...\")\n  log.Fatal(http.ListenAndServe(\":8080\", nil))\n}",
+        "package main\n\nimport (\n  \"fmt\"\n  \"context\"\n  \"time\"\n)\n\nfunc main() {\n  // Create a context with timeout\n  ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n  defer cancel()\n  \n  // Simulate work with context\n  result := doWork(ctx)\n  fmt.Println(result)\n}\n\nfunc doWork(ctx context.Context) string {\n  select {\n  case <-time.After(3 * time.Second):\n    return \"Work completed\"\n  case <-ctx.Done():\n    return \"Work cancelled: \" + ctx.Err().Error()\n  }\n}"
+      ],
+      rs: [
+        "use std::collections::HashMap;\nuse std::thread;\nuse std::sync::{Arc, Mutex};\n\nfn main() {\n  let data = Arc::new(Mutex::new(HashMap::new()));\n  let mut handles = vec![];\n  \n  for i in 0..5 {\n    let data_clone = Arc::clone(&data);\n    let handle = thread::spawn(move || {\n      let mut map = data_clone.lock().unwrap();\n      map.insert(i, i * 2);\n    });\n    handles.push(handle);\n  }\n  \n  for handle in handles {\n    handle.join().unwrap();\n  }\n  \n  println!(\"Data: {:?}\", data.lock().unwrap());\n}",
+        "fn fibonacci(n: u32) -> u64 {\n  match n {\n    0 => 0,\n    1 => 1,\n    _ => fibonacci(n - 1) + fibonacci(n - 2)\n  }\n}\n\nfn main() {\n  for i in 0..10 {\n    println!(\"fibonacci({}) = {}\", i, fibonacci(i));\n  }\n}",
+        "#[derive(Debug)]\nenum Message {\n  Quit,\n  Move { x: i32, y: i32 },\n  Write(String),\n  ChangeColor(i32, i32, i32),\n}\n\nimpl Message {\n  fn call(&self) {\n    match self {\n      Message::Quit => println!(\"Quitting\"),\n      Message::Move { x, y } => println!(\"Moving to ({}, {})\", x, y),\n      Message::Write(text) => println!(\"Writing: {}\", text),\n      Message::ChangeColor(r, g, b) => println!(\"Changing color to RGB({}, {}, {})\", r, g, b),\n    }\n  }\n}\n\nfn main() {\n  let messages = [\n    Message::Quit,\n    Message::Move { x: 10, y: 20 },\n    Message::Write(String::from(\"Hello, world!\")),\n    Message::ChangeColor(255, 0, 0),\n  ];\n  \n  for message in &messages {\n    message.call();\n  }\n}"
+      ]
+    };
+
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      const randomLanguage = languages[Math.floor(Math.random() * languages.length)];
+      const languageCode = randomLanguage.extension;
+      const languageName = randomLanguage.name;
+
+      const samples = codeSamples[languageCode];
+      if (samples && samples.length > 0) {
+        const randomSample = samples[Math.floor(Math.random() * samples.length)];
+        result.push(`${languageName}:\n\n\`\`\`${languageCode}\n${randomSample}\n\`\`\``);
+      } else {
+        result.push(`${languageName}:\n\n\`\`\`${languageCode}\n// Sample code for ${languageName}\n\`\`\``);
       }
     }
 
-    return this.defaultResponses[Math.floor(Math.random() * this.defaultResponses.length)];
+    return result.join('\n\n');
   }
 
   generateLongResponse(paragraphs) {
