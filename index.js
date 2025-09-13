@@ -403,6 +403,17 @@ class ElizaBot {
       return this.generateLongResponse(1);
     }
 
+    // Markdown table patterns
+    if (input === '|||') {
+      return this.generateMarkdownTables(4);
+    }
+    if (input === '||') {
+      return this.generateMarkdownTables(3);
+    }
+    if (input === '|') {
+      return this.generateMarkdownTables(1);
+    }
+
     // No control pattern matched
     return null;
   }
@@ -549,6 +560,48 @@ class ElizaBot {
       }
     }
     return result;
+  }
+
+  generateMarkdownTables(count) {
+    const tableSamples = [
+      // Simple narrow table
+      "| Name | Age |\n|------|-----|\n| John | 25  |\n| Jane | 22  |\n| Bob  | 30  |",
+
+      // Wide table with complex content
+      "| Feature          | Description                                                                 | Status      | Version |\n|------------------|-----------------------------------------------------------------------------|-------------|---------|\n| Real-time chat   | Instant messaging with low latency                                          | ✅ Active    | 2.1.0   |\n| File sharing     | Share documents, images, and other files up to 100MB                         | ✅ Active    | 1.5.2   |\n| Video calls      | High-quality video conferencing with up to 50 participants                  | ⚠️ Beta     | 3.0.0   |\n| Screen sharing   | Share your screen with others in real-time                                  | ❌ Disabled  | 1.0.0   |",
+
+      // Table with code snippets
+      "| Language   | Hello World Example                        |\n|------------|--------------------------------------------|\n| Python     | `print(\"Hello, World!\")`                   |\n| JavaScript | `console.log(\"Hello, World!\");`            |\n| Java       | `System.out.println(\"Hello, World!\");`     |\n| C++        | `std::cout << \"Hello, World!\" << std::endl;` |",
+
+      // Table with links
+      "| Resource        | URL                                | Notes                   |\n|-----------------|------------------------------------|-------------------------|\n| Documentation   | [docs.example.com](https://docs.example.com) | Comprehensive guides    |\n| API Reference   | [api.example.com](https://api.example.com)   | Interactive endpoints   |\n| Community Forum | [forum.example.com](https://forum.example.com) | User discussions        |",
+
+      // Table with formatting
+      "| Priority | Task           | Details                     | Deadline   |\n|----------|----------------|-----------------------------|------------|\n| **High** | _Code review_  | ~~Documentation~~           | 2023-10-15  |\n| *Medium*| **Testing**    | <br>Integration tests<br>   | 2023-11-01  |\n| Low      | Deployment     | `npm run deploy`            | 2023-12-01  |",
+
+      // Complex table with multiple data types
+      "| ID | Product Name     | Price  | In Stock | Last Updated       | Tags                    |\n|----|------------------|--------|----------|--------------------|-------------------------|\n| 1  | Laptop Pro       | $1299  | Yes      | 2023-09-15         | `electronics` `laptop`  |\n| 2  | Wireless Mouse   | $29.99 | No       | 2023-08-22         | `accessories` `wireless`|\n| 3  | Mechanical Keyboard| $89.99| Yes      | 2023-09-10         | `accessories` `gaming`  |",
+
+      // Table with line breaks and complex formatting
+      "| Command | Description                          | Example Usage                   |\n|---------|--------------------------------------|---------------------------------|\n| git log | Show commit logs<br>with history     | `git log --oneline`<br>`git log --graph` |",
+
+      // Simple data table
+      "| Month    | Revenue | Expenses | Profit |\n|----------|---------|----------|--------|\n| January  | $10,000 | $7,000   | $3,000 |\n| February | $12,000 | $8,000   | $4,000 |\n| March    | $15,000 | $9,000   | $6,000 |",
+
+      // Table with mixed content
+      "| Item        | Quantity | Notes                          |\n|-------------|----------|--------------------------------|\n| Coffee      | 5 bags   | Preferably dark roast          |\n| Sugar       | 2 kg     | [Buy online](https://store.example.com) |\n| `Code files`| Unknown  | **Check repository**<br>for details |",
+
+      // Minimalist table
+      "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |"
+    ];
+
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      const randomTable = tableSamples[Math.floor(Math.random() * tableSamples.length)];
+      result.push(`Here's a markdown table for testing:\n\n${randomTable}`);
+    }
+
+    return result.join('\n\n');
   }
 }
 

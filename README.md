@@ -79,6 +79,13 @@ Each code block is formatted as a fenced markdown code block with a brief explan
 - `)` / `))` / `)))` - Add latency (500ms/2.5s/5s)
 - `(` / `((` / `(((` - Reduce latency / reset to baseline (50ms)
 
+### Markdown Table Generation
+- `|` - Single random markdown table with varied content
+- `||` - 2-3 random markdown tables with varied content
+- `|||` - 3-4 random markdown tables with varied content
+
+Each table includes different markdown formatting features like complex content, code snippets, links, line breaks, and various table structures for comprehensive testing.
+
 ## Example Usage
 
 ### cURL
