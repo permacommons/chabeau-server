@@ -136,11 +136,23 @@ The chatbot recognizes classic ELIZA patterns:
 - **Questions:** "Why..." → "Why don't you tell me the reason why...?"
 - **Statements:** "I am..." → "How long have you been...?"
 
+## Project Structure
+
+The server is organized into focused, single-responsibility modules:
+
+- **`index.js`** - Main entry point, starts the server
+- **`server.js`** - HTTP server logic and API endpoints  
+- **`eliza-bot.js`** - ELIZA chatbot implementation and content generation
+
 ## Development
 
 Built with Node.js built-in modules only (`http`, `url`) - no external dependencies required.
 
-To modify ELIZA patterns, edit the `patterns` array in the `ElizaBot` class within `index.js`.
+To modify ELIZA patterns, edit the `patterns` array in the `ElizaBot` class within `eliza-bot.js`.
+
+To add new API endpoints, modify the request handling logic in `server.js`.
+
+To change server configuration, update the startup logic in `index.js`.
 
 ## License
 
