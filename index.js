@@ -414,6 +414,17 @@ class ElizaBot {
       return this.generateMarkdownTables(1);
     }
 
+    // Link generation patterns
+    if (input === '%%%') {
+      return this.generateLinkedContent(3);
+    }
+    if (input === '%%') {
+      return this.generateLinkedContent(2);
+    }
+    if (input === '%') {
+      return this.generateLinkedContent(1);
+    }
+
     // No control pattern matched
     return null;
   }
@@ -632,6 +643,113 @@ class ElizaBot {
     }
 
     return result.join('\n\n');
+  }
+
+  generateLinkedContent(complexity) {
+    const urls = [
+      "https://www.example.com",
+      "https://docs.hypertext.org",
+      "https://xanadu.net",
+      "https://www.w3.org",
+      "https://info.cern.ch",
+      "https://www.ietf.org/rfc/rfc1945.txt",
+      "https://web.archive.org",
+      "https://github.com/worldwideweb",
+      "https://developer.mozilla.org",
+      "https://www.whatwg.org",
+      "https://semantic-web.org",
+      "https://linked-data.org",
+      "https://microformats.org",
+      "https://indieweb.org",
+      "https://webfoundation.org",
+      "https://www.ted.com/talks/tim_berners_lee",
+      "https://hyperland.com",
+      "https://memex.org",
+      "https://nelson.systems",
+      "https://transcopyright.org"
+    ];
+
+    const linkTexts = [
+      "the original web proposal",
+      "hypertext dreams",
+      "Xanadu's vision",
+      "universal information space",
+      "the first website",
+      "HTTP specification",
+      "digital preservation",
+      "collaborative development",
+      "web standards",
+      "living documents",
+      "semantic connections",
+      "linked data principles",
+      "structured markup",
+      "decentralized web",
+      "information freedom",
+      "the web's inventor",
+      "interactive media",
+      "associative trails",
+      "literary machines",
+      "transcopyright theory"
+    ];
+
+    if (complexity === 1) {
+      // Simple format with plain URLs and basic markdown links
+      const plainUrl = urls[Math.floor(Math.random() * urls.length)];
+      const linkUrl = urls[Math.floor(Math.random() * urls.length)];
+      const linkText = linkTexts[Math.floor(Math.random() * linkTexts.length)];
+
+      return `In the grand tradition of Douglas Adams' infinite improbability, the web emerged from the most unlikely of places - a particle physics laboratory where Tim Berners-Lee was trying to solve the mundane problem of information sharing. Much like the Babel fish, which solved all communication problems and thereby caused more wars than anything else in history, the World Wide Web solved the problem of accessing information and promptly created the problem of information overload.
+
+Consider this fascinating resource: ${plainUrl}
+
+Ted Nelson's Xanadu project, meanwhile, had been dreaming of [${linkText}](${linkUrl}) since the 1960s - a system of interconnected documents that would make all human knowledge accessible through associative links. It was the literary equivalent of the Heart of Gold's infinite improbability drive, capable of connecting any two ideas no matter how seemingly unrelated.
+
+The web we got wasn't quite Xanadu's vision of transcopyright and parallel documents, but it did give us something equally improbable: a system where a search for "how to fix a leaky faucet" could lead you through seventeen Wikipedia articles to learn about the mating habits of deep-sea anglerfish. As Adams might say, the web is big. Really big. You just won't believe how vastly, hugely, mind-bogglingly big it is.`;
+    }
+
+    if (complexity === 2) {
+      // Multiple paragraphs with various link formats
+      const urls1 = urls.slice(0, 3).map((url, i) => ({ url, text: linkTexts[i] }));
+      const plainUrls = urls.slice(3, 5);
+
+      return `The story of hypertext begins not with Tim Berners-Lee's World Wide Web, but with Vannevar Bush's 1945 essay "As We May Think," where he envisioned the Memex - a device that would store books, records, and communications, and mechanically link them together by association. This was ${plainUrls[0]} territory: the realm of infinite possibility where information could be connected in ways that mirrored human thought itself.
+
+Ted Nelson, inspired by Bush's vision, coined the term "hypertext" in 1963 and spent decades developing [${urls1[0].text}](${urls1[0].url}) - a system that would revolutionize how we think about documents, copyright, and knowledge itself. Nelson's Xanadu wasn't just about linking documents; it was about creating a [${urls1[1].text}](${urls1[1].url}) where every quotation would be automatically linked to its source, where authors would be compensated for every use of their work, and where the sum of human knowledge would be accessible through an elegant web of associations.
+
+Meanwhile, at CERN in 1989, Tim Berners-Lee was facing a more prosaic problem: scientists couldn't easily share information across different computer systems. His solution was elegantly simple compared to Xanadu's grand vision - a system of [${urls1[2].text}](${urls1[2].url}) that used simple markup and universal identifiers. The web that emerged was less ambitious than Xanadu but infinitely more practical, like the difference between the Hitchhiker's Guide to the Galaxy (which knows everything but is often wrong) and a really good encyclopedia (which knows less but is usually right).
+
+The irony, as Douglas Adams would appreciate, is that both visions came true in unexpected ways. We got Nelson's associative linking through hyperlinks, Bush's vast information storage through search engines, and Berners-Lee's universal access through ${plainUrls[1]}. What we also got, quite by accident, was the ability for anyone to publish anything, leading to a universe where the answer to life, the universe, and everything might actually be findable - if you can figure out the right search terms.`;
+    }
+
+    if (complexity === 3) {
+      // Complex content with markdown table containing links
+      const tableUrls = urls.slice(0, 6).map((url, i) => ({ url, text: linkTexts[i] }));
+      const paragraphUrls = urls.slice(6, 10).map((url, i) => ({ url, text: linkTexts[i + 6] }));
+      const plainUrls = urls.slice(10, 13);
+
+      return `In 1945, Vannevar Bush published "As We May Think" in The Atlantic Monthly, describing a device called the Memex that would store vast amounts of information and allow users to create associative trails between documents. This wasn't just science fiction - it was a blueprint for what would eventually become the World Wide Web, though it would take nearly half a century and the combined genius of visionaries like Ted Nelson and Tim Berners-Lee to make it reality.
+
+| **Visionary** | **Project/Contribution** | **Key Innovation** | **Timeline** | **Legacy** |
+|---------------|-------------------------|-------------------|--------------|------------|
+| Vannevar Bush | Memex Concept | [${tableUrls[0].text}](${tableUrls[0].url}) | 1945 | Inspired hypertext pioneers |
+| Ted Nelson | Xanadu Project | [${tableUrls[1].text}](${tableUrls[1].url}) | 1960s-present | Coined "hypertext" and "hypermedia" |
+| Douglas Engelbart | oN-Line System (NLS) | [${tableUrls[2].text}](${tableUrls[2].url}) | 1968 | Demonstrated collaborative computing |
+| Tim Berners-Lee | World Wide Web | [${tableUrls[3].text}](${tableUrls[3].url}) | 1989-1991 | Created the web we know today |
+| Marc Andreessen | Mosaic Browser | [${tableUrls[4].text}](${tableUrls[4].url}) | 1993 | Made the web accessible to everyone |
+| Brewster Kahle | Internet Archive | [${tableUrls[5].text}](${tableUrls[5].url}) | 1996 | Preserving digital history |
+
+Ted Nelson's Xanadu project, begun in the 1960s, was perhaps the most ambitious of these visions. Nelson didn't just want to link documents - he wanted to create a [${paragraphUrls[0].text}](${paragraphUrls[0].url}) where every piece of text would maintain its connection to its source, where authors would be automatically compensated for quotations, and where the entire corpus of human knowledge would be navigable through what he called "transclusion" - the ability to include parts of documents within other documents while maintaining their original context.
+
+The web that Tim Berners-Lee actually created at CERN was more modest but infinitely more practical. Instead of Nelson's complex bidirectional links and micropayment systems, Berners-Lee opted for simple one-way links and free access. His [${paragraphUrls[1].text}](${paragraphUrls[1].url}) included three fundamental technologies: HTML for structuring documents, HTTP for transferring them, and URLs for addressing them. The first website, ${plainUrls[0]}, went live in 1991 and explained what the World Wide Web was.
+
+As Douglas Adams might have observed, the web's success came not from solving the problem of information organization (which it spectacularly failed to do), but from making information sharing so easy that organization became someone else's problem. Search engines like Google became the Babel fish of the internet - universal translators that could find meaning in the chaos. The [${paragraphUrls[2].text}](${paragraphUrls[2].url}) that emerged wasn't the elegant, structured knowledge space that Nelson envisioned, but rather something more like the Hitchhiker's Guide itself: vast, mostly harmless, occasionally accurate, and utterly indispensable.
+
+Today, as we grapple with issues of misinformation, platform monopolies, and digital rights, Nelson's original vision of [${paragraphUrls[3].text}](${paragraphUrls[3].url}) seems more relevant than ever. The IndieWeb movement, blockchain-based publishing, and efforts to create more equitable creator compensation systems all echo Xanadu's core principles. Perhaps, as Adams suggested about the universe, the web isn't finished yet - it's still in beta, and the real version is still being debugged.
+
+The ultimate irony is that both Bush's Memex and Nelson's Xanadu were designed to augment human intelligence and creativity, while the web we actually got often seems designed to distract us from both. But then again, as any reader of The Hitchhiker's Guide to the Galaxy knows, the most important thing about any technology isn't what it was designed to do, but what people actually do with it. And what people have done with the web - from ${plainUrls[1]} to ${plainUrls[2]} - has been nothing short of extraordinary, even if it wasn't quite what anyone originally had in mind.`;
+    }
+
+    return "The web is a curious thing, much like a digital Babel fish - it connects everything to everything else, but doesn't necessarily make any of it more comprehensible.";
   }
 }
 

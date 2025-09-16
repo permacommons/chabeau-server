@@ -86,6 +86,13 @@ Each code block is formatted as a fenced markdown code block with a brief explan
 
 Each table includes different markdown formatting features like complex content, code snippets, links, line breaks, and various table structures for comprehensive testing.
 
+### Link Generation
+- `%` - Simple text with plain URLs and basic markdown links
+- `%%` - Multiple paragraphs with various link formats and styles
+- `%%%` - Complex content including markdown tables with embedded links
+
+Generates content with links in various formats (plain URLs, markdown links in paragraphs, and links within tables) with flavor text inspired by the intersection of Douglas Adams' wit, Ted Nelson's Xanadu vision, and Tim Berners-Lee's web invention.
+
 ## Example Usage
 
 ### cURL
