@@ -548,8 +548,8 @@ class ElizaBot {
     }
 
     return result.join('\n\n');
-  }  ge
-nerateMarkdownTables(count) {
+  }  
+  generateMarkdownTables(count) {
     const tableSamples = [
       // Simple narrow table
       "| Name | Age |\n|------|-----|\n| John | 25  |\n| Jane | 22  |\n| Bob  | 30  |",
