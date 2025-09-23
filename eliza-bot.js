@@ -445,8 +445,9 @@ class ElizaBot {
 
     // No code block pattern matched
     return null;
-  }  g
-enerateLongResponse(paragraphs) {
+  }
+
+  generateLongResponse(paragraphs) {
     const responses = [
       "The fascinating thing about conversations is how they meander through topics like a river finding its way to the sea. Each exchange builds upon the last, creating a unique narrative that neither participant could have predicted at the outset. It's remarkable how human communication evolved from simple grunts and gestures to this complex dance of ideas, emotions, and shared understanding that we call dialogue.",
       
