@@ -1,6 +1,6 @@
-const http = require('http');
-const url = require('url');
-const { ElizaBot } = require('./eliza-bot');
+import http from 'http';
+import url from 'url';
+import { ElizaBot } from './eliza-bot.js';
 
 // Initialize ELIZA bot
 const eliza = new ElizaBot();
@@ -255,4 +255,4 @@ function createServer(port = 3000) {
   return server;
 }
 
-module.exports = { createServer };
+export { createServer };

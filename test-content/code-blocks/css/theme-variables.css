@@ -1,0 +1,17 @@
+.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --accent-color: #4da6ff;
+}
+
+.light-mode {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --accent-color: #0066cc;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}

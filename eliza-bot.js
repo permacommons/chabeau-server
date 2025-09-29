@@ -1,6 +1,11 @@
 // ELIZA chatbot implementation with content generation
+import ContentManager from './lib/content-manager.js';
+
 class ElizaBot {
   constructor() {
+    // Initialize ContentManager for filesystem-based content
+    this.contentManager = new ContentManager('./test-content');
+    this.contentLoaded = false;
     this.patterns = [
       {
         pattern: /I need (.*)/i,
@@ -268,6 +273,24 @@ class ElizaBot {
       "How does that make you feel?",
       "How do you feel when you say that?"
     ];
+
+    // Initialize content loading during startup
+    this._initializeContent();
+  }
+
+  /**
+   * Initialize content loading from filesystem
+   * @private
+   */
+  async _initializeContent() {
+    try {
+      await this.contentManager.loadContent();
+      this.contentLoaded = true;
+      console.log('ElizaBot: Content loading completed successfully');
+    } catch (error) {
+      console.error('ElizaBot: Failed to load content, will use fallback responses:', error.message);
+      this.contentLoaded = false;
+    }
   }
 
   respond(input) {
@@ -448,30 +471,20 @@ class ElizaBot {
   }
 
   generateLongResponse(paragraphs) {
-    const responses = [
-      "The fascinating thing about conversations is how they meander through topics like a river finding its way to the sea. Each exchange builds upon the last, creating a unique narrative that neither participant could have predicted at the outset. It's remarkable how human communication evolved from simple grunts and gestures to this complex dance of ideas, emotions, and shared understanding that we call dialogue.",
-      
-      "In the realm of artificial intelligence and human-computer interaction, we're witnessing an unprecedented convergence of technology and psychology. The boundaries between human and machine communication are becoming increasingly blurred, not because machines are becoming more human, but because we're discovering new ways to bridge the gap between silicon-based processing and carbon-based consciousness.",
-      
-      "Consider the philosophical implications of our digital age: every conversation, every search query, every click represents a tiny fragment of human intention preserved in electronic amber. We're creating an archaeological record of our collective consciousness that future generations will study to understand how we thought, what we valued, and how we made sense of an increasingly complex world.",
-      
-      "The art of conversation has always been about more than just exchanging information. It's about connection, empathy, and the shared human experience of trying to understand and be understood. Whether we're talking to another person or to an AI system, we're engaging in one of humanity's most fundamental activities: the attempt to bridge the gap between one mind and another.",
-      
-      "Technology has transformed how we communicate, but it hasn't changed why we communicate. We still seek understanding, connection, and meaning in our interactions. The medium may have evolved from cave paintings to digital text, but the underlying human need to share our thoughts and experiences remains as strong as ever.",
-      
-      "What's particularly intriguing about modern AI systems is how they mirror certain aspects of human conversation while remaining fundamentally different. They can process language, recognize patterns, and generate responses that feel natural, yet they lack the lived experience, emotions, and consciousness that give human communication its depth and authenticity."
-    ];
-
-    const result = [];
-    for (let i = 0; i < paragraphs; i++) {
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      result.push(randomResponse);
-    }
-
-    return result.join('\n\n');
+    return this.contentManager.getLongResponse(paragraphs);
   }
 
   generateCodeBlocks(count) {
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      const codeBlock = this.contentManager.getCodeBlock();
+      result.push(codeBlock);
+    }
+    return result.join('\n\n');
+  }
+  
+  // Legacy method - keeping for reference but now using ContentManager
+  _generateCodeBlocksOld(count) {
     const languages = [
       { name: "Python", extension: "py" },
       { name: "SQL", extension: "sql" },
@@ -550,6 +563,11 @@ class ElizaBot {
     return result.join('\n\n');
   }  
   generateMarkdownTables(count) {
+    return this.contentManager.getMarkdownTable(count);
+  }
+  
+  // Legacy method - keeping for reference but now using ContentManager
+  _generateMarkdownTablesOld(count) {
     const tableSamples = [
       // Simple narrow table with basic formatting
       "| **Name** | *Age* | Status |\n|----------|-------|--------|\n| **John** | *25*  | Active |\n| **Jane** | *22*  | [Online](https://example.com/jane) |\n| **Bob**  | *30*  | ***Premium*** |",
@@ -607,6 +625,11 @@ class ElizaBot {
   }
 
   generateLinkedContent(complexity) {
+    return this.contentManager.getLinkedContent(complexity);
+  }
+  
+  // Legacy method - keeping for reference but now using ContentManager
+  _generateLinkedContentOld(complexity) {
     const urls = [
       "https://www.example.com",
       "https://docs.hypertext.org",
@@ -718,4 +741,4 @@ The ultimate irony is that both Bush's Memex and Nelson's Xanadu were designed t
 global.streamingSpeedMultiplier = 1;
 global.requestLatency = 50;
 
-module.exports = { ElizaBot };
+export { ElizaBot };

@@ -136,23 +136,90 @@ The chatbot recognizes classic ELIZA patterns:
 - **Questions:** "Why..." → "Why don't you tell me the reason why...?"
 - **Statements:** "I am..." → "How long have you been...?"
 
+## Server Development
+
+### Content Management System
+
+The server uses a filesystem-based content management system that allows server developers to easily add new test content without modifying the core bot logic.
+
+#### Directory Structure
+
+```
+test-content/
+├── config.toml                 # Main configuration file
+├── code-blocks/                # Programming language examples
+│   ├── python/                 # Python code samples
+│   ├── javascript/             # JavaScript code samples
+│   ├── sql/                    # SQL query examples
+│   ├── bash/                   # Shell script examples
+│   ├── html/                   # HTML markup examples
+│   ├── css/                    # CSS styling examples
+│   ├── java/                   # Java code examples
+│   ├── cpp/                    # C++ code examples
+│   ├── go/                     # Go code examples
+│   └── rust/                   # Rust code examples
+├── long-responses/             # Extended paragraph content
+├── tables/                     # Markdown table examples
+└── links/                      # Content with embedded links
+```
+
+#### Adding New Content
+
+**Code Blocks:** Add new files to the appropriate language directory under `test-content/code-blocks/`. Files should contain complete, runnable code examples with proper file extensions (`.py`, `.js`, `.sql`, etc.).
+
+**Long Responses:** Add `.txt` files to `test-content/long-responses/`. Each file should contain one coherent paragraph of 80-120 words.
+
+**Tables:** Add `.md` files to `test-content/tables/`. Each file should contain one complete markdown table with headers and data.
+
+**Links:** Add content files to `test-content/links/`. Support plain URLs, markdown links, and table-embedded links.
+
+#### Configuration
+
+The `test-content/config.toml` file controls content categories, command mappings, and system settings. The system automatically discovers new content files without requiring configuration changes.
+
+#### File Organization Standards
+
+- Use descriptive filenames that indicate the content purpose
+- Maintain consistent file extensions for each content type
+- Organize code blocks by programming language
+- Keep content files focused on single examples or concepts
+- Ensure all content is properly formatted and readable
+
 ## Project Structure
 
 The server is organized into focused, single-responsibility modules:
 
 - **`index.js`** - Main entry point, starts the server
 - **`server.js`** - HTTP server logic and API endpoints  
-- **`eliza-bot.js`** - ELIZA chatbot implementation and content generation
+- **`eliza-bot.js`** - ELIZA chatbot implementation using ContentManager
+- **`lib/content-manager.js`** - Content loading and management system
+- **`lib/config-loader.js`** - TOML configuration file handling
+- **`test-content/`** - Filesystem-based content organization
+  - **`config.toml`** - Content system configuration
+  - **`code-blocks/`** - Programming language examples by language
+  - **`long-responses/`** - Extended paragraph content files
+  - **`tables/`** - Markdown table examples
+  - **`links/`** - Content with various link formats
 
 ## Development
 
-Built with Node.js built-in modules only (`http`, `url`) - no external dependencies required.
+### Dependencies
 
-To modify ELIZA patterns, edit the `patterns` array in the `ElizaBot` class within `eliza-bot.js`.
+The server uses minimal dependencies:
+- **`smol-toml`** - TOML configuration file parsing
+- Node.js built-in modules (`http`, `url`, `fs`, `path`)
 
-To add new API endpoints, modify the request handling logic in `server.js`.
+### Modifying Content
 
-To change server configuration, update the startup logic in `index.js`.
+**ELIZA Patterns:** Edit the `patterns` array in the `ElizaBot` class within `eliza-bot.js`.
+
+**Test Content:** Add files to appropriate directories under `test-content/`. The system automatically discovers and loads new content.
+
+**API Endpoints:** Modify the request handling logic in `server.js`.
+
+**Server Configuration:** Update the startup logic in `index.js`.
+
+**Content System:** Modify `lib/content-manager.js` for content loading behavior or `test-content/config.toml` for content settings.
 
 ## License
 

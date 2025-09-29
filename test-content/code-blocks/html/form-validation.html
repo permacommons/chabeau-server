@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="A simple form example">
+  <title>Form Validation</title>
+</head>
+<body>
+  <form id="userForm" novalidate>
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <span class="error" id="emailError"></span>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <span class="error" id="passwordError"></span>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+  <script src="validate.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+# ELIZA Test Content Configuration
+# This file defines content categories, settings, and command mappings
+
+[content]
+# Content categories and their settings
+
+[content.code-blocks]
+enabled = true
+languages = ["python", "javascript", "sql", "bash", "html", "css", "java", "cpp", "go", "rust"]
+
+[content.long-responses]
+enabled = true
+max_paragraphs = 6
+
+[content.tables]
+enabled = true
+formats = ["markdown"]
+
+[content.links]
+enabled = true
+complexity_levels = ["simple", "complex", "table-embedded"]
+
+[commands]
+# Command pattern mappings for different content types
+
+# Code block commands
+code_single = "@"
+code_multiple = "@@"
+code_many = "@@@"
+
+# Long response commands
+response_short = "!"
+response_medium = "!!"
+response_long = "!!!"
+
+# Table commands
+table_single = "|"
+table_multiple = "||"
+table_many = "|||"
+
+# Link commands
+link_simple = "%"
+link_complex = "%%"
+link_advanced = "%%%"
+
+[settings]
+# Global settings for content management
+hot_reload = false
+cache_content = true
+fallback_enabled = true
+log_level = "info"

@@ -1,0 +1,7 @@
+In the grand tradition of Douglas Adams' infinite improbability, the web emerged from the most unlikely of places - a particle physics laboratory where Tim Berners-Lee was trying to solve the mundane problem of information sharing. Much like the Babel fish, which solved all communication problems and thereby caused more wars than anything else in history, the World Wide Web solved the problem of accessing information and promptly created the problem of information overload.
+
+Consider this fascinating resource: https://www.example.com
+
+Ted Nelson's Xanadu project, meanwhile, had been dreaming of [hypertext dreams](https://xanadu.net) since the 1960s - a system of interconnected documents that would make all human knowledge accessible through associative links. It was the literary equivalent of the Heart of Gold's infinite improbability drive, capable of connecting any two ideas no matter how seemingly unrelated.
+
+The web we got wasn't quite Xanadu's vision of transcopyright and parallel documents, but it did give us something equally improbable: a system where a search for "how to fix a leaky faucet" could lead you through seventeen Wikipedia articles to learn about the mating habits of deep-sea anglerfish. As Adams might say, the web is big. Really big. You just won't believe how vastly, hugely, mind-bogglingly big it is.

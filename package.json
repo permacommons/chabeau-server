@@ -2,15 +2,23 @@
   "name": "chabeau-server",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest --run",
+    "test:watch": "vitest"
   },
   "keywords": ["eliza", "chatbot", "openai", "api", "server"],
   "author": "",
   "license": "CC0-1.0",
   "description": "A simple ELIZA chatbot dummy server with OpenAI-compatible API",
+  "dependencies": {
+    "smol-toml": "^1.3.1"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
+  },
   "files": [
     "index.js",
     "server.js", 
