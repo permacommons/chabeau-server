@@ -482,7 +482,11 @@ class ElizaBot {
     }
     return result.join('\n\n');
   }
-  
+
+  generateMarkdownTables(count) {
+    return this.contentManager.getMarkdownTable(count);
+  }
+
   generateLinkedContent(complexity) {
     return this.contentManager.getLinkedContent(complexity);
   }
