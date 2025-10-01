@@ -288,7 +288,7 @@ class ElizaBot {
       this.contentLoaded = true;
       console.log('ElizaBot: Content loading completed successfully');
     } catch (error) {
-      console.error('ElizaBot: Failed to load content, will use fallback responses:', error.message);
+      console.error('ElizaBot: Failed to load content. Control commands will return empty output until content files are provided:', error.message);
       this.contentLoaded = false;
     }
   }
@@ -298,13 +298,13 @@ class ElizaBot {
 
     // Handle control patterns
     const controlResponse = this.handleControlPatterns(cleanInput);
-    if (controlResponse) {
+    if (controlResponse !== null && controlResponse !== undefined) {
       return controlResponse;
     }
 
     // Handle code block generation patterns
     const codeBlockResponse = this.handleCodeBlockPatterns(cleanInput);
-    if (codeBlockResponse) {
+    if (codeBlockResponse !== null && codeBlockResponse !== undefined) {
       return codeBlockResponse;
     }
 
@@ -439,6 +439,17 @@ class ElizaBot {
       return this.generateMarkdownTables(1);
     }
 
+    // Rich markdown patterns
+    if (input === '$$$') {
+      return this.generateRichMarkdown(3);
+    }
+    if (input === '$$') {
+      return this.generateRichMarkdown(2);
+    }
+    if (input === '$') {
+      return this.generateRichMarkdown(1);
+    }
+
     // Link generation patterns
     if (input === '%%%') {
       return this.generateLinkedContent(3);
@@ -478,13 +489,19 @@ class ElizaBot {
     const result = [];
     for (let i = 0; i < count; i++) {
       const codeBlock = this.contentManager.getCodeBlock();
-      result.push(codeBlock);
+      if (codeBlock) {
+        result.push(codeBlock);
+      }
     }
     return result.join('\n\n');
   }
 
   generateMarkdownTables(count) {
     return this.contentManager.getMarkdownTable(count);
+  }
+
+  generateRichMarkdown(count) {
+    return this.contentManager.getRichMarkdown(count);
   }
 
   generateLinkedContent(complexity) {

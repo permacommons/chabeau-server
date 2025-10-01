@@ -23,6 +23,7 @@ test-content/
 │   ├── go/                     # *.go files
 │   └── rust/                   # *.rs files
 ├── long-responses/             # *.txt files
+├── rich-markdown/              # *.md files with rich markdown paragraphs
 ├── tables/                     # *.md files
 └── links/                      # *.txt, *.md files
 ```
@@ -123,6 +124,31 @@ Add table examples to `test-content/tables/` as `.md` files.
 
 Add content with embedded links to `test-content/links/`.
 
+### Rich Markdown Paragraphs
+
+Add expressive markdown paragraphs to `test-content/rich-markdown/` as `.md` files.
+
+**File Requirements:**
+- Focus on prose about money with a witty or reflective tone
+- Avoid tables and fenced code blocks
+- Include at least one markdown embellishment (horizontal rule, image, emoji)
+- Keep content concise—typically one or two short paragraphs per file
+
+**Example - Adding a rich markdown file:**
+
+```bash
+# Create: test-content/rich-markdown/midnight-ledger.md
+```
+
+```markdown
+Money tiptoes through midnight like it owns the dark, jingling just loudly enough to wake your ambitions. 😴💸
+
+---
+
+![A neon sign shaped like a coin](https://example.com/neon-coin.jpg)
+It promises dreams are on sale in aisle seven, provided you remember your loyalty card.
+```
+
 **File Requirements:**
 - Mix of plain URLs and markdown links
 - Contextual, engaging content
@@ -158,6 +184,10 @@ languages = ["python", "javascript", "sql", "bash", "html", "css", "java", "cpp"
 enabled = true
 max_paragraphs = 6
 
+[content."rich-markdown"]
+enabled = true
+max_paragraphs = 6
+
 [content.tables]
 enabled = true
 formats = ["markdown"]
@@ -174,6 +204,9 @@ code_many = "@@@"
 response_short = "!"
 response_medium = "!!"
 response_long = "!!!"
+rich_single = "$"
+rich_double = "$$"
+rich_triple = "$$$"
 table_single = "|"
 table_multiple = "||"
 table_many = "|||"

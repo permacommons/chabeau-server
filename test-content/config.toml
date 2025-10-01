@@ -12,6 +12,10 @@ languages = ["python", "javascript", "sql", "bash", "html", "css", "java", "cpp"
 enabled = true
 max_paragraphs = 6
 
+[content."rich-markdown"]
+enabled = true
+max_paragraphs = 6
+
 [content.tables]
 enabled = true
 formats = ["markdown"]
@@ -32,6 +36,11 @@ code_many = "@@@"
 response_short = "!"
 response_medium = "!!"
 response_long = "!!!"
+
+# Rich markdown commands
+rich_single = "$"
+rich_double = "$$"
+rich_triple = "$$$"
 
 # Table commands
 table_single = "|"

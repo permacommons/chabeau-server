@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -24,6 +24,7 @@ describe('Content Migration Validation', () => {
         'test-content',
         'test-content/code-blocks',
         'test-content/long-responses',
+        'test-content/rich-markdown',
         'test-content/tables',
         'test-content/links'
       ];
@@ -79,6 +80,10 @@ describe('Content Migration Validation', () => {
 
     it('should have long response content', () => {
       expect(contentStatus.contentBreakdown.longResponses).toBeGreaterThan(0);
+    });
+
+    it('should have rich markdown content', () => {
+      expect(contentStatus.contentBreakdown.richMarkdown).toBeGreaterThan(0);
     });
 
     it('should have table content', () => {
@@ -165,6 +170,14 @@ describe('Content Migration Validation', () => {
       
       // Should have meaningful content (not just empty placeholders)
       expect(linkContent.length).toBeGreaterThan(20);
+    });
+
+    it('should have expressive rich markdown content', () => {
+      const richContent = contentManager.getRichMarkdown(2);
+
+      expect(richContent.length).toBeGreaterThan(80);
+      expect(richContent).toMatch(/---|\!\[.*\]\(.*\)/);
+      expect(richContent).toMatch(/[😏💰✨🐶💸]/);
     });
   });
 
@@ -357,27 +370,37 @@ describe('Content Migration Validation', () => {
       expect(links).toMatch(/https?:\/\/[^\s]+|\[.*\]\(.*\)/);
     });
 
-    it('should provide fallback content when filesystem content unavailable', () => {
+    it('should log guidance when filesystem content unavailable', () => {
       // Temporarily disable content loading
       const originalIsLoaded = contentManager.isLoaded;
       contentManager.isLoaded = false;
-      
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       try {
-        // Should still provide valid content
         const codeBlock = contentManager.getCodeBlock();
-        expect(codeBlock).toMatch(/^```\w+\n[\s\S]*\n```$/);
-        
         const longResponse = contentManager.getLongResponse();
-        expect(longResponse.length).toBeGreaterThan(50);
-        
         const table = contentManager.getMarkdownTable();
-        expect(table).toContain('|');
-        
         const links = contentManager.getLinkedContent();
-        expect(links).toMatch(/https?:\/\/[^\s]+|\[.*\]\(.*\)/);
+
+        expect(codeBlock).toBe('');
+        expect(longResponse).toBe('');
+        expect(table).toBe('');
+        expect(links).toBe('');
+
+        const messages = errorSpy.mock.calls.map(call => call[0]);
+        expect(messages.some(msg => msg.includes('code block content'))).toBe(true);
+        expect(messages.some(msg => msg.includes(path.join(contentManager.contentPath, 'code-blocks')))).toBe(true);
+        expect(messages.some(msg => msg.includes('long response content'))).toBe(true);
+        expect(messages.some(msg => msg.includes(path.join(contentManager.contentPath, 'long-responses')))).toBe(true);
+        expect(messages.some(msg => msg.includes('markdown table content'))).toBe(true);
+        expect(messages.some(msg => msg.includes(path.join(contentManager.contentPath, 'tables')))).toBe(true);
+        expect(messages.some(msg => msg.includes('linked content'))).toBe(true);
+        expect(messages.some(msg => msg.includes(path.join(contentManager.contentPath, 'links')))).toBe(true);
       } finally {
         // Restore original state
         contentManager.isLoaded = originalIsLoaded;
+        errorSpy.mockRestore();
       }
     });
   });
