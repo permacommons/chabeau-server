@@ -93,6 +93,13 @@ Each table includes different markdown formatting features like complex content,
 
 Generates content with links in various formats (plain URLs, markdown links in paragraphs, and links within tables) with flavor text inspired by the intersection of Douglas Adams' wit, Ted Nelson's Xanadu vision, and Tim Berners-Lee's web invention.
 
+### Rich Markdown Paragraphs
+- `$` - A single wry markdown paragraph about money, adorned with visuals
+- `$$` - Two rich paragraphs with imagery, horizontal rules, and emojis
+- `$$$` - Three richly formatted paragraphs for maximum markdown variety
+
+These responses focus on reflective, tongue-in-cheek commentary about money—no tables or code fences—while showcasing markdown images, horizontal rules, and expressive emoji.
+
 ## Example Usage
 
 ### cURL
@@ -159,6 +166,7 @@ test-content/
 │   ├── go/                     # Go code examples
 │   └── rust/                   # Rust code examples
 ├── long-responses/             # Extended paragraph content
+├── rich-markdown/              # Rich markdown paragraphs with imagery
 ├── tables/                     # Markdown table examples
 └── links/                      # Content with embedded links
 ```
@@ -168,6 +176,8 @@ test-content/
 **Code Blocks:** Add new files to the appropriate language directory under `test-content/code-blocks/`. Files should contain complete, runnable code examples with proper file extensions (`.py`, `.js`, `.sql`, etc.).
 
 **Long Responses:** Add `.txt` files to `test-content/long-responses/`. Each file should contain one coherent paragraph of 80-120 words.
+
+**Rich Markdown:** Add `.md` files to `test-content/rich-markdown/`. Each file should feature expressive paragraphs without tables or code fences, optionally including horizontal rules, images, and emoji for visual richness.
 
 **Tables:** Add `.md` files to `test-content/tables/`. Each file should contain one complete markdown table with headers and data.
 
@@ -198,6 +208,7 @@ The server is organized into focused, single-responsibility modules:
   - **`config.toml`** - Content system configuration
   - **`code-blocks/`** - Programming language examples by language
   - **`long-responses/`** - Extended paragraph content files
+  - **`rich-markdown/`** - Rich markdown paragraphs with imagery and emoji
   - **`tables/`** - Markdown table examples
   - **`links/`** - Content with various link formats
 

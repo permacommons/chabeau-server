@@ -26,6 +26,10 @@ vi.mock('../../lib/config-loader.js', () => {
               enabled: true,
               max_paragraphs: 6
             },
+            'rich-markdown': {
+              enabled: true,
+              max_paragraphs: 6
+            },
             tables: {
               enabled: true,
               formats: ['markdown']
@@ -61,6 +65,7 @@ describe('ContentManager', () => {
     await fs.mkdir(path.join(testContentPath, 'code-blocks', 'python'), { recursive: true });
     await fs.mkdir(path.join(testContentPath, 'code-blocks', 'javascript'), { recursive: true });
     await fs.mkdir(path.join(testContentPath, 'long-responses'), { recursive: true });
+    await fs.mkdir(path.join(testContentPath, 'rich-markdown'), { recursive: true });
     await fs.mkdir(path.join(testContentPath, 'tables'), { recursive: true });
     await fs.mkdir(path.join(testContentPath, 'links'), { recursive: true });
   });
@@ -92,6 +97,7 @@ describe('ContentManager', () => {
       expect(contentManager.contentRegistry).toEqual({
         'code-blocks': {},
         'long-responses': [],
+        'rich-markdown': [],
         'tables': [],
         'links': {}
       });
@@ -124,7 +130,12 @@ describe('ContentManager', () => {
         path.join(testContentPath, 'long-responses', 'response1.txt'),
         'This is a test long response paragraph with meaningful content.'
       );
-      
+
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich-1.md'),
+        'Money winks, and we pretend it is subtle.'
+      );
+
       await fs.writeFile(
         path.join(testContentPath, 'tables', 'test-table.md'),
         '| Name | Age |\n|------|-----|\n| John | 30 |\n| Jane | 25 |'
@@ -143,6 +154,7 @@ describe('ContentManager', () => {
       expect(contentManager.contentRegistry['code-blocks']['python']).toHaveLength(1);
       expect(contentManager.contentRegistry['code-blocks']['javascript']).toHaveLength(1);
       expect(contentManager.contentRegistry['long-responses']).toHaveLength(1);
+      expect(contentManager.contentRegistry['rich-markdown']).toHaveLength(1);
       expect(contentManager.contentRegistry['tables']).toHaveLength(1);
       expect(contentManager.contentRegistry['links']['simple']).toHaveLength(1);
     });
@@ -201,7 +213,18 @@ describe('ContentManager', () => {
         path.join(testContentPath, 'long-responses', 'response2.txt'),
         'Second response paragraph.'
       );
-      
+
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich-1.md'),
+        'Money rehearses sincerity before every transaction.'
+      );
+
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich-2.md'),
+        `---
+Profit is the stand-up routine; risk is the heckler.`
+      );
+
       await contentManager.loadContent();
     });
 
@@ -231,6 +254,12 @@ describe('ContentManager', () => {
       const selected = contentManager._selectRandomContent('non-existent', 1);
       expect(selected).toHaveLength(0);
     });
+
+    it('should select content from rich-markdown category', () => {
+      const selected = contentManager._selectRandomContent('rich-markdown', 2);
+      expect(selected).toHaveLength(2);
+      selected.forEach(item => expect(item.category).toBe('rich-markdown'));
+    });
   });
 
   describe('getCodeBlock', () => {
@@ -252,17 +281,27 @@ describe('ContentManager', () => {
       expect(codeBlock).toMatch(/^```python\n[\s\S]*\n```$/);
     });
 
-    it('should return fallback when content not loaded', () => {
+    it('should log guidance when content not loaded', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       contentManager.isLoaded = false;
       const codeBlock = contentManager.getCodeBlock('python');
-      expect(codeBlock).toMatch(/^```python\n[\s\S]*\n```$/);
-      expect(codeBlock).toContain('fibonacci');
+      expect(codeBlock).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('code block content');
+      expect(message).toContain(path.join(testContentPath, 'code-blocks', 'python'));
+      errorSpy.mockRestore();
     });
 
-    it('should return fallback for non-existent language', () => {
+    it('should log guidance for non-existent language', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const codeBlock = contentManager.getCodeBlock('nonexistent');
-      expect(codeBlock).toMatch(/^```nonexistent\n[\s\S]*\n```$/);
-      expect(codeBlock).toContain('fetchData'); // Should use javascript fallback content
+      expect(codeBlock).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('code block content');
+      expect(message).toContain(path.join(testContentPath, 'code-blocks', 'nonexistent'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -296,10 +335,56 @@ describe('ContentManager', () => {
       expect(response.split('\n\n').length).toBeLessThanOrEqual(6);
     });
 
-    it('should return fallback when content not loaded', () => {
+    it('should log guidance when content not loaded', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       contentManager.isLoaded = false;
       const response = contentManager.getLongResponse();
-      expect(response).toContain('digital communication');
+      expect(response).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('long response content');
+      expect(message).toContain(path.join(testContentPath, 'long-responses'));
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('getRichMarkdown', () => {
+    beforeEach(async () => {
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich-1.md'),
+        `Money plays dress-up as virtue. 😏
+
+![A velvet coin purse](https://example.com/purse.jpg)`
+      );
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich-2.md'),
+        `---
+Cashflow is just cardio with invoices. 💪💰`
+      );
+      await contentManager.loadContent();
+    });
+
+    it('should return single paragraph by default', () => {
+      const content = contentManager.getRichMarkdown();
+      expect(content).toBeTruthy();
+      expect(content.split('\n\n').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should return multiple paragraphs when requested', () => {
+      const content = contentManager.getRichMarkdown(2);
+      expect(content.split('\n\n').length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should log guidance when content not loaded', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      contentManager.isLoaded = false;
+      const content = contentManager.getRichMarkdown();
+      expect(content).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('rich markdown content');
+      expect(message).toContain(path.join(testContentPath, 'rich-markdown'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -319,11 +404,16 @@ describe('ContentManager', () => {
       expect(table).toContain('Age');
     });
 
-    it('should return fallback when content not loaded', () => {
+    it('should log guidance when content not loaded', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       contentManager.isLoaded = false;
       const table = contentManager.getMarkdownTable();
-      expect(table).toContain('Feature');
-      expect(table).toContain('Status');
+      expect(table).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('markdown table content');
+      expect(message).toContain(path.join(testContentPath, 'tables'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -350,10 +440,16 @@ describe('ContentManager', () => {
       expect(content).toBeTruthy();
     });
 
-    it('should return fallback when content not loaded', () => {
+    it('should log guidance when content not loaded', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       contentManager.isLoaded = false;
       const content = contentManager.getLinkedContent();
-      expect(content).toContain('https://docs.example.com');
+      expect(content).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('linked content');
+      expect(message).toContain(path.join(testContentPath, 'links'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -421,6 +517,10 @@ describe('ContentManager', () => {
         path.join(testContentPath, 'long-responses', 'response.txt'),
         'Test response'
       );
+      await fs.writeFile(
+        path.join(testContentPath, 'rich-markdown', 'rich.md'),
+        'Money has a punchline, and we keep laughing.'
+      );
       await contentManager.loadContent();
     });
 
@@ -436,54 +536,21 @@ describe('ContentManager', () => {
       
       expect(status.contentBreakdown).toHaveProperty('codeBlocks');
       expect(status.contentBreakdown).toHaveProperty('longResponses');
+      expect(status.contentBreakdown).toHaveProperty('richMarkdown');
       expect(status.contentBreakdown).toHaveProperty('tables');
       expect(status.contentBreakdown).toHaveProperty('links');
     });
 
     it('should report correct content counts', () => {
       const status = contentManager.getStatus();
-      
-      expect(status.totalContent).toBe(2);
+
+      expect(status.totalContent).toBe(3);
       expect(status.contentBreakdown.codeBlocks.total).toBe(1);
       expect(status.contentBreakdown.longResponses).toBe(1);
+      expect(status.contentBreakdown.richMarkdown).toBe(1);
       expect(status.contentBreakdown.tables).toBe(0);
       expect(status.contentBreakdown.links.total).toBe(0);
     });
   });
 
-  describe('Fallback Content', () => {
-    it('should provide fallback code blocks for all supported languages', () => {
-      const pythonFallback = contentManager._getFallbackCodeBlock('python');
-      const jsFallback = contentManager._getFallbackCodeBlock('javascript');
-      const sqlFallback = contentManager._getFallbackCodeBlock('sql');
-      
-      expect(pythonFallback).toMatch(/^```python\n[\s\S]*\n```$/);
-      expect(jsFallback).toMatch(/^```javascript\n[\s\S]*\n```$/);
-      expect(sqlFallback).toMatch(/^```sql\n[\s\S]*\n```$/);
-    });
-
-    it('should provide multiple fallback paragraphs', () => {
-      const singleParagraph = contentManager._getFallbackLongResponse(1);
-      const multipleParagraphs = contentManager._getFallbackLongResponse(3);
-      
-      expect(singleParagraph.split('\n\n')).toHaveLength(1);
-      expect(multipleParagraphs.split('\n\n')).toHaveLength(3);
-    });
-
-    it('should provide fallback tables', () => {
-      const table = contentManager._getFallbackMarkdownTable(1);
-      expect(table).toContain('|');
-      expect(table).toContain('Feature');
-    });
-
-    it('should provide fallback linked content for all complexity levels', () => {
-      const simple = contentManager._getFallbackLinkedContent(1);
-      const complex = contentManager._getFallbackLinkedContent(2);
-      const advanced = contentManager._getFallbackLinkedContent(3);
-      
-      expect(simple).toContain('https://');
-      expect(complex).toContain('[');
-      expect(advanced).toContain('|');
-    });
-  });
 });

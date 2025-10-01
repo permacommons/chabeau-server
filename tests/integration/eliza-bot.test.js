@@ -86,7 +86,12 @@ code_many = "@@@"`
       path.join(testContentPath, 'links', 'complex-links.md'),
       'Check out our [documentation](https://docs.example.com) and [API reference](https://api.example.com) for detailed information.'
     );
-    
+
+    await fs.writeFile(
+      path.join(testContentPath, 'links', 'table-links.md'),
+      '| Resource | Link |\n|----------|------|\n| Status Dashboard | [Uptime](https://status.example.com) |\n| Feature Roadmap | [Projects](https://projects.example.com) |'
+    );
+
     // Create bot instance with test content path
     bot = new ElizaBot();
     bot.contentManager.contentPath = testContentPath;
@@ -165,14 +170,18 @@ code_many = "@@@"`
       expect(response).toMatch(/hello_world|helloWorld/);
     });
 
-    it('should fallback gracefully when content unavailable', async () => {
+    it('should log guidance when content unavailable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       // Temporarily break content loading
       bot.contentManager.isLoaded = false;
-      
+
       const response = bot.respond('@');
-      expect(response).toMatch(/^```\w+\n[\s\S]*\n```$/);
-      // Should contain fallback content
-      expect(response).toMatch(/fibonacci|fetchData|SELECT/);
+      expect(response).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('code block content');
+      expect(message).toContain(path.join(testContentPath, 'code-blocks'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -205,14 +214,18 @@ code_many = "@@@"`
       expect(response).toMatch(/test response paragraph|content management system|test paragraph|additional content/);
     });
 
-    it('should fallback gracefully when content unavailable', () => {
+    it('should log guidance when content unavailable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       // Temporarily break content loading
       bot.contentManager.isLoaded = false;
-      
+
       const response = bot.respond('!');
-      expect(response).toBeTruthy();
-      // Should contain fallback content
-      expect(response).toMatch(/digital communication|conversational AI|human-AI interaction/);
+      expect(response).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('long response content');
+      expect(message).toContain(path.join(testContentPath, 'long-responses'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -245,14 +258,18 @@ code_many = "@@@"`
       expect(response).toMatch(/Feature|Status|Priority|Testing|Documentation/);
     });
 
-    it('should fallback gracefully when content unavailable', () => {
+    it('should log guidance when content unavailable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       // Temporarily break content loading
       bot.contentManager.isLoaded = false;
-      
+
       const response = bot.respond('|');
-      expect(response).toContain('|');
-      // Should contain fallback content
-      expect(response).toMatch(/Feature|Status|Language|Popularity/);
+      expect(response).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('markdown table content');
+      expect(message).toContain(path.join(testContentPath, 'tables'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -282,14 +299,18 @@ code_many = "@@@"`
       expect(response).toMatch(/example\.com|documentation|API reference/);
     });
 
-    it('should fallback gracefully when content unavailable', () => {
+    it('should log guidance when content unavailable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       // Temporarily break content loading
       bot.contentManager.isLoaded = false;
-      
+
       const response = bot.respond('%');
-      expect(response).toMatch(/https?:\/\/[^\s]+/);
-      // Should contain fallback content
-      expect(response).toMatch(/docs\.example\.com|github\.com|forum\.example\.com/);
+      expect(response).toBe('');
+      expect(errorSpy).toHaveBeenCalled();
+      const [message] = errorSpy.mock.calls[0];
+      expect(message).toContain('linked content');
+      expect(message).toContain(path.join(testContentPath, 'links'));
+      errorSpy.mockRestore();
     });
   });
 
@@ -411,18 +432,26 @@ code_many = "@@@"`
     });
   });
 
-  describe('Error Handling and Fallback Behavior', () => {
+  describe('Error Handling and Missing Content Behavior', () => {
     it('should handle content loading failures gracefully', async () => {
       // Create a bot with invalid content path
       const invalidBot = new ElizaBot();
       invalidBot.contentManager.contentPath = '/nonexistent/path';
-      
+
       // Try to load content (should fail)
       await invalidBot.contentManager.loadContent();
-      
-      // Bot should still respond to commands using fallback content
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Bot should still respond to commands without crashing
       const response = invalidBot.respond('@');
-      expect(response).toMatch(/^```\w+\n[\s\S]*\n```$/);
+      expect(response).toBe('');
+
+      const messages = errorSpy.mock.calls.map(call => call[0]);
+      expect(messages.some(msg => msg.includes('code block content'))).toBe(true);
+      expect(messages.some(msg => msg.includes(path.join('/nonexistent/path', 'code-blocks')))).toBe(true);
+
+      errorSpy.mockRestore();
     });
 
     it('should maintain ELIZA functionality when content system fails', () => {
@@ -437,18 +466,25 @@ code_many = "@@@"`
     it('should handle mixed content availability', async () => {
       // Remove some content categories
       await fs.rm(path.join(testContentPath, 'tables'), { recursive: true });
-      
+
       // Reload content
       await bot.contentManager.loadContent();
-      
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       // Code blocks should work (content available)
       const codeResponse = bot.respond('@');
       expect(codeResponse).toMatch(/^```\w+\n[\s\S]*\n```$/);
-      
-      // Tables should fallback (content unavailable)
+
+      // Tables should log guidance when content unavailable
       const tableResponse = bot.respond('|');
-      expect(tableResponse).toContain('|');
-      expect(tableResponse).toMatch(/Feature|Status|Language|Popularity/); // Fallback content
+      expect(tableResponse).toBe('');
+
+      const messages = errorSpy.mock.calls.map(call => call[0]);
+      expect(messages.some(msg => msg.includes('markdown table content'))).toBe(true);
+      expect(messages.some(msg => msg.includes(path.join(testContentPath, 'tables')))).toBe(true);
+
+      errorSpy.mockRestore();
     });
   });
 
