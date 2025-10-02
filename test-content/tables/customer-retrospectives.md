@@ -1,0 +1,5 @@
+| Sprint | Persona | Feedback Summary |
+|--------|---------|------------------|
+| Sprint 12 | Finance Administrator | The revised reconciliation view reduced monthly close time from nine hours to under four, allowing the team to eliminate the midnight crunch. <br><br>They requested preserving the legacy export for one more quarter so downstream scripts can be rewritten without blocking adoption. |
+| Sprint 13 | Support Lead | The searchable incident timeline finally made trend analysis possible without spreadsheets, and the embedded playbooks are being reused across regions. <br><br>However, escalation alerts still arrive too late on mobile during overnight rotations; they asked for richer push notification metadata. |
+| Sprint 14 | Field Engineer | Offline diagnostics now sync in under two minutes when connectivity returns, turning multi-day truck rolls into single-visit fixes for rural customers. <br><br>The team suggested adding a "fix verified" toggle so technicians can capture contextual photos before leaving the site. |
