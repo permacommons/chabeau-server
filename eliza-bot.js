@@ -461,6 +461,28 @@ class ElizaBot {
       return this.generateLinkedContent(1);
     }
 
+    // Terminal-breaking emoji patterns
+    if (input === '&&&') {
+      return this.generateTerminalBreakingEmoji(3);
+    }
+    if (input === '&&') {
+      return this.generateTerminalBreakingEmoji(2);
+    }
+    if (input === '&') {
+      return this.generateTerminalBreakingEmoji(1);
+    }
+
+    // International text patterns
+    if (input === '~~~') {
+      return this.generateInternationalText(3);
+    }
+    if (input === '~~') {
+      return this.generateInternationalText(2);
+    }
+    if (input === '~') {
+      return this.generateInternationalText(1);
+    }
+
     // No control pattern matched
     return null;
   }
@@ -506,6 +528,14 @@ class ElizaBot {
 
   generateLinkedContent(complexity) {
     return this.contentManager.getLinkedContent(complexity);
+  }
+
+  generateTerminalBreakingEmoji(count) {
+    return this.contentManager.getTerminalBreakingEmoji(count);
+  }
+
+  generateInternationalText(count) {
+    return this.contentManager.getInternationalText(count);
   }
 
 }

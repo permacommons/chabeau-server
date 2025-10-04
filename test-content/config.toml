@@ -24,6 +24,14 @@ formats = ["markdown"]
 enabled = true
 complexity_levels = ["simple", "complex", "table-embedded"]
 
+[content."terminal-breaking-emoji"]
+enabled = true
+max_items = 3
+
+[content."international-text"]
+enabled = true
+max_items = 3
+
 [commands]
 # Command pattern mappings for different content types
 
@@ -51,6 +59,16 @@ table_many = "|||"
 link_simple = "%"
 link_complex = "%%"
 link_advanced = "%%%"
+
+# Terminal-breaking emoji commands
+emoji_single = "&"
+emoji_double = "&&"
+emoji_triple = "&&&"
+
+# International text commands
+intl_single = "~"
+intl_double = "~~"
+intl_triple = "~~~"
 
 [settings]
 # Global settings for content management

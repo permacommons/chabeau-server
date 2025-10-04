@@ -100,6 +100,20 @@ Generates content with links in various formats (plain URLs, markdown links in p
 
 These responses focus on reflective, tongue-in-cheek commentary about money—no tables or code fences—while showcasing markdown images, horizontal rules, and expressive emoji.
 
+### Terminal-Breaking Emoji
+- `&` - Single file with complex emoji modifiers (skin tones, ZWJ sequences)
+- `&&` - Two files with diverse emoji combinations
+- `&&&` - Three files with maximum emoji complexity
+
+Content featuring human-animal relationships with extensive use of emoji modifiers including skin tone variations (👨🏾‍💼 👩🏻‍🔬), gender+profession ZWJ sequences (🐕‍🦺 👨🏽‍⚕️), multi-person families (👨‍👩‍👧‍👦), keycap sequences (#️⃣ *️⃣), flag tags (🏴󠁧󠁢󠁳󠁣󠁴󠁿), and variation selectors (☀️). Includes tables, formatted prose, and unformatted prose to stress-test terminal rendering.
+
+### International Text
+- `~` - Single file with CJK, Arabic, or mixed scripts
+- `~~` - Two files with diverse language combinations
+- `~~~` - Three files with maximum script complexity
+
+Multilingual content testing complex text rendering including CJK (Chinese 中文, Japanese 日本語, Korean 한국어), RTL scripts (Arabic العربية, Hebrew עברית), South Asian scripts (Devanagari हिन्दी, Bengali বাংলা), Southeast Asian (Thai ไทย, Khmer ភាសាខ្មែរ), Cyrillic (Русский), and others. Features bidirectional text, multiple number systems (١٢٣ ๑๒๓ १२३), currency symbols (﷼ ₪ ₹ ฿), and complex tables mixing scripts.
+
 ## Example Usage
 
 ### cURL
@@ -168,7 +182,9 @@ test-content/
 ├── long-responses/             # Extended paragraph content
 ├── rich-markdown/              # Rich markdown paragraphs with imagery
 ├── tables/                     # Markdown table examples
-└── links/                      # Content with embedded links
+├── links/                      # Content with embedded links
+├── terminal-breaking-emoji/    # Complex emoji with modifiers
+└── international-text/         # Multilingual and multi-script content
 ```
 
 #### Adding New Content
@@ -182,6 +198,10 @@ test-content/
 **Tables:** Add `.md` files to `test-content/tables/`. Each file should contain one complete markdown table with headers and data.
 
 **Links:** Add content files to `test-content/links/`. Support plain URLs, markdown links, and table-embedded links.
+
+**Terminal-Breaking Emoji:** Add `.md` files to `test-content/terminal-breaking-emoji/`. Content should include complex emoji with skin tone modifiers, ZWJ sequences, multi-person groupings, keycap sequences, and flag tags to stress-test terminal rendering.
+
+**International Text:** Add `.md` files to `test-content/international-text/`. Include content in various scripts (CJK, Arabic, Hebrew, Devanagari, Thai, Cyrillic, etc.) with bidirectional text, multiple number systems, and mixed-script tables.
 
 #### Configuration
 
@@ -211,6 +231,8 @@ The server is organized into focused, single-responsibility modules:
   - **`rich-markdown/`** - Rich markdown paragraphs with imagery and emoji
   - **`tables/`** - Markdown table examples
   - **`links/`** - Content with various link formats
+  - **`terminal-breaking-emoji/`** - Complex emoji with modifiers and ZWJ sequences
+  - **`international-text/`** - Multilingual content with diverse scripts
 
 ## Development
 

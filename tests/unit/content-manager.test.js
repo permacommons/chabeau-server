@@ -99,7 +99,9 @@ describe('ContentManager', () => {
         'long-responses': [],
         'rich-markdown': [],
         'tables': [],
-        'links': {}
+        'links': {},
+        'terminal-breaking-emoji': [],
+        'international-text': []
       });
     });
   });
