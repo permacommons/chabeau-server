@@ -114,6 +114,12 @@ Content featuring human-animal relationships with extensive use of emoji modifie
 
 Multilingual content testing complex text rendering including CJK (Chinese 中文, Japanese 日本語, Korean 한국어), RTL scripts (Arabic العربية, Hebrew עברית), South Asian scripts (Devanagari हिन्दी, Bengali বাংলা), Southeast Asian (Thai ไทย, Khmer ភាសាខ្មែរ), Cyrillic (Русский), and others. Features bidirectional text, multiple number systems (١٢٣ ๑๒๓ १२३), currency symbols (﷼ ₪ ₹ ฿), and complex tables mixing scripts.
 
+### API Debugging Commands
+- `system` - Returns the system prompt from the API request (if any) in a markdown code block
+- `raw` - Returns the complete raw API payload as formatted JSON in a markdown code block
+
+These commands help debug API integrations by showing exactly what data was sent to the server. If no system prompt was provided, the `system` command returns "No system prompt was submitted."
+
 ## Example Usage
 
 ### cURL

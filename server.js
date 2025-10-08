@@ -222,8 +222,18 @@ function createServer(port = 3000) {
               return;
             }
 
+            // Extract system prompt if present
+            const systemMessage = messages.find(msg => msg.role === 'system');
+            const systemPrompt = systemMessage ? systemMessage.content : null;
+
+            // Prepare context for the bot
+            const context = {
+              systemPrompt,
+              rawPayload: requestData
+            };
+
             // Generate ELIZA response
-            const elizaResponse = eliza.respond(lastMessage.content);
+            const elizaResponse = eliza.respond(lastMessage.content, context);
 
             // Send response (streaming or non-streaming)
             streamResponse(res, elizaResponse, stream);
