@@ -432,6 +432,65 @@ code_many = "@@@"`
     });
   });
 
+  describe('System and Raw API Commands', () => {
+    it('should return system prompt when available', () => {
+      const context = {
+        systemPrompt: 'You are a helpful assistant.',
+        rawPayload: { messages: [] }
+      };
+      
+      const response = bot.respond('system', context);
+      expect(response).toBe('```\nYou are a helpful assistant.\n```');
+    });
+
+    it('should return no system prompt message when not available', () => {
+      const context = {
+        systemPrompt: null,
+        rawPayload: { messages: [] }
+      };
+      
+      const response = bot.respond('system', context);
+      expect(response).toBe('No system prompt was submitted.');
+    });
+
+    it('should return raw API payload as JSON', () => {
+      const testPayload = {
+        messages: [
+          { role: 'user', content: 'Hello' }
+        ],
+        model: 'eliza-1.0',
+        stream: false
+      };
+      
+      const context = {
+        systemPrompt: null,
+        rawPayload: testPayload
+      };
+      
+      const response = bot.respond('raw', context);
+      const expectedJson = JSON.stringify(testPayload, null, 2);
+      expect(response).toBe(`\`\`\`json\n${expectedJson}\n\`\`\``);
+    });
+
+    it('should return empty JSON when no payload available', () => {
+      const context = {
+        systemPrompt: null,
+        rawPayload: null
+      };
+      
+      const response = bot.respond('raw', context);
+      expect(response).toBe('```json\n{}\n```');
+    });
+
+    it('should work without context parameter', () => {
+      const systemResponse = bot.respond('system');
+      expect(systemResponse).toBe('No system prompt was submitted.');
+      
+      const rawResponse = bot.respond('raw');
+      expect(rawResponse).toBe('```json\n{}\n```');
+    });
+  });
+
   describe('Error Handling and Missing Content Behavior', () => {
     it('should handle content loading failures gracefully', async () => {
       // Create a bot with invalid content path

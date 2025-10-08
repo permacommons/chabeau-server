@@ -293,11 +293,11 @@ class ElizaBot {
     }
   }
 
-  respond(input) {
+  respond(input, context = {}) {
     const cleanInput = input.trim();
 
     // Handle control patterns
-    const controlResponse = this.handleControlPatterns(cleanInput);
+    const controlResponse = this.handleControlPatterns(cleanInput, context);
     if (controlResponse !== null && controlResponse !== undefined) {
       return controlResponse;
     }
@@ -328,7 +328,26 @@ class ElizaBot {
     });
   }
 
-  handleControlPatterns(input) {
+  handleControlPatterns(input, context = {}) {
+    // System and raw API payload commands
+    if (input === 'system') {
+      const systemMessage = context.systemPrompt;
+      if (systemMessage) {
+        return `\`\`\`\n${systemMessage}\n\`\`\``;
+      } else {
+        return "No system prompt was submitted.";
+      }
+    }
+
+    if (input === 'raw') {
+      const rawPayload = context.rawPayload;
+      if (rawPayload) {
+        return `\`\`\`json\n${JSON.stringify(rawPayload, null, 2)}\n\`\`\``;
+      } else {
+        return `\`\`\`json\n{}\n\`\`\``;
+      }
+    }
+
     // Speed control patterns
     if (input === '>>>') {
       global.streamingSpeedMultiplier = 100;
