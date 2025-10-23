@@ -11,118 +11,49 @@ npm start
 
 Server runs on `http://localhost:3000` (set `PORT` environment variable to customize).
 
-## API Endpoints
+## Features
 
-### Chat Completions
-`POST /v1/chat/completions` - OpenAI-compatible chat endpoint
+### OpenAI-Compatible API
 
-**Authentication:** `Authorization: Bearer <any-token>` (use "badtoken" to test auth failures)
+- **Chat Completions:** `POST /v1/chat/completions`
+- **Model Listing:** `GET /v1/models`
+- **Health Check:** `GET /health`
 
-**Request:**
-```json
-{
-  "model": "eliza-1.0",
-  "messages": [{"role": "user", "content": "Hello!"}],
-  "stream": false
-}
-```
+Authentication is handled via bearer token (`Authorization: Bearer <any-token>`). Use "badtoken" to test authentication failures.
 
-**Response:**
-```json
-{
-  "id": "chatcmpl-1234567890",
-  "object": "chat.completion",
-  "created": 1677610602,
-  "model": "eliza-1.0",
-  "choices": [{
-    "index": 0,
-    "message": {
-      "role": "assistant",
-      "content": "Hello... I'm glad you could drop by today."
-    },
-    "finish_reason": "stop"
-  }],
-  "usage": {
-    "prompt_tokens": 10,
-    "completion_tokens": 8,
-    "total_tokens": 18
-  }
-}
-```
+### Content Generation
 
-### Other Endpoints
-- `GET /v1/models` - List available models
-- `GET /health` - Health check
+The server can generate a wide variety of content for testing purposes:
 
-## Testing Features
+| Feature                      | Commands          | Description                                             |
+| ---------------------------- | ----------------- | ------------------------------------------------------- |
+| **Long Responses**           | `!`, `!!`, `!!!`    | Generates one to three paragraphs of text.              |
+| **Code Blocks**              | `@`, `@@`, `@@@`    | Generates one, three, or five code blocks.              |
+| **Markdown Tables**          | `|`, `||`, `|||`    | Generates one to four Markdown tables.                  |
+| **Links**                    | `%`, `%%`, `%%%`    | Generates text with various types of links.             |
+| **Rich Markdown**            | `$`, `$$`, `$$$`    | Generates paragraphs with rich Markdown formatting.     |
+| **Complex Emoji**            | `&`, `&&`, `&&&`    | Generates text with complex, multi-character emoji.     |
+| **International Text**       | `~`, `~~`, `~~~`    | Generates text in various non-English languages.        |
 
-### Long Response Generation
-- `!` - Single long paragraph (~85 tokens)
-- `!!` - Two paragraphs (~170 tokens)
-- `!!!` - Three paragraphs (~260 tokens)
+### ELIZA Chatbot
 
-Perfect for testing "re-generate reply" functionality with varied content.
+The server's core is a classic ELIZA implementation that recognizes and responds to common conversational patterns, such as:
 
-### Code Block Generation
-- `@` - Single random code block in various programming languages
-- `@@` - Three random code blocks in various programming languages
-- `@@@` - Five random code blocks in various programming languages
+- **Needs:** "I need..." → "Why do you need...?"
+- **Feelings:** "I feel..." → "Tell me more about these feelings."
+- **Questions:** "Why..." → "Why don't you tell me the reason why...?"
+- **Statements:** "I am..." → "How long have you been...?"
 
-Each code block is formatted as a fenced markdown code block with a brief explanation text. Supported languages include Python, SQL, Bash, JavaScript, HTML, CSS, Java, C++, Go, and Rust.
+### Server Control
 
-
-### Streaming Speed Control
-- `>` / `>>` / `>>>` - Increase speed (5x/10x/100x baseline)
-- `<` / `<<` / `<<<` - Decrease speed / reset to baseline (50 tokens/sec)
-
-### Request Latency Control
-- `)` / `))` / `)))` - Add latency (500ms/2.5s/5s)
-- `(` / `((` / `(((` - Reduce latency / reset to baseline (50ms)
-
-### Markdown Table Generation
-- `|` - Single random markdown table with varied content
-- `||` - 2-3 random markdown tables with varied content
-- `|||` - 3-4 random markdown tables with varied content
-
-Each table includes different markdown formatting features like complex content, code snippets, links, line breaks, and various table structures for comprehensive testing.
-
-### Link Generation
-- `%` - Simple text with plain URLs and basic markdown links
-- `%%` - Multiple paragraphs with various link formats and styles
-- `%%%` - Complex content including markdown tables with embedded links
-
-Generates content with links in various formats (plain URLs, markdown links in paragraphs, and links within tables) with flavor text inspired by the intersection of Douglas Adams' wit, Ted Nelson's Xanadu vision, and Tim Berners-Lee's web invention.
-
-### Rich Markdown Paragraphs
-- `$` - A single wry markdown paragraph about money, adorned with visuals
-- `$$` - Two rich paragraphs with imagery, horizontal rules, and emojis
-- `$$$` - Three richly formatted paragraphs for maximum markdown variety
-
-These responses focus on reflective, tongue-in-cheek commentary about money—no tables or code fences—while showcasing markdown images, horizontal rules, and expressive emoji.
-
-### Terminal-Breaking Emoji
-- `&` - Single file with complex emoji modifiers (skin tones, ZWJ sequences)
-- `&&` - Two files with diverse emoji combinations
-- `&&&` - Three files with maximum emoji complexity
-
-Content featuring human-animal relationships with extensive use of emoji modifiers including skin tone variations (👨🏾‍💼 👩🏻‍🔬), gender+profession ZWJ sequences (🐕‍🦺 👨🏽‍⚕️), multi-person families (👨‍👩‍👧‍👦), keycap sequences (#️⃣ *️⃣), flag tags (🏴󠁧󠁢󠁳󠁣󠁴󠁿), and variation selectors (☀️). Includes tables, formatted prose, and unformatted prose to stress-test terminal rendering.
-
-### International Text
-- `~` - Single file with CJK, Arabic, or mixed scripts
-- `~~` - Two files with diverse language combinations
-- `~~~` - Three files with maximum script complexity
-
-Multilingual content testing complex text rendering including CJK (Chinese 中文, Japanese 日本語, Korean 한국어), RTL scripts (Arabic العربية, Hebrew עברית), South Asian scripts (Devanagari हिन्दी, Bengali বাংলা), Southeast Asian (Thai ไทย, Khmer ភាសាខ្មែរ), Cyrillic (Русский), and others. Features bidirectional text, multiple number systems (١٢٣ ๑๒๓ १२३), currency symbols (﷼ ₪ ₹ ฿), and complex tables mixing scripts.
-
-### API Debugging Commands
-- `system` - Returns the system prompt from the API request (if any) in a markdown code block
-- `raw` - Returns the complete raw API payload as formatted JSON in a markdown code block
-
-These commands help debug API integrations by showing exactly what data was sent to the server. If no system prompt was provided, the `system` command returns "No system prompt was submitted."
+- **Streaming Speed:** Control the response speed with `>` (faster) and `<` (slower) commands.
+- **Request Latency:** Adjust the server's response time with `)` (slower) and `(` (faster) commands.
+- **API Debugging:** Use `system` to inspect the system prompt and `raw` to view the raw API payload.
 
 ## Example Usage
 
 ### cURL
+
 ```bash
 # Basic chat
 curl -X POST http://localhost:3000/v1/chat/completions \
@@ -138,6 +69,7 @@ curl -X POST http://localhost:3000/v1/chat/completions \
 ```
 
 ### JavaScript
+
 ```javascript
 const response = await fetch('http://localhost:3000/v1/chat/completions', {
   method: 'POST',
@@ -155,104 +87,32 @@ const data = await response.json();
 console.log(data.choices[0].message.content);
 ```
 
-## ELIZA Patterns
-
-The chatbot recognizes classic ELIZA patterns:
-- **Needs:** "I need..." → "Why do you need...?"
-- **Feelings:** "I feel..." → "Tell me more about these feelings."
-- **Questions:** "Why..." → "Why don't you tell me the reason why...?"
-- **Statements:** "I am..." → "How long have you been...?"
-
-## Server Development
-
-### Content Management System
-
-The server uses a filesystem-based content management system that allows server developers to easily add new test content without modifying the core bot logic.
-
-#### Directory Structure
-
-```
-test-content/
-├── config.toml                 # Main configuration file
-├── code-blocks/                # Programming language examples
-│   ├── python/                 # Python code samples
-│   ├── javascript/             # JavaScript code samples
-│   ├── sql/                    # SQL query examples
-│   ├── bash/                   # Shell script examples
-│   ├── html/                   # HTML markup examples
-│   ├── css/                    # CSS styling examples
-│   ├── java/                   # Java code examples
-│   ├── cpp/                    # C++ code examples
-│   ├── go/                     # Go code examples
-│   └── rust/                   # Rust code examples
-├── long-responses/             # Extended paragraph content
-├── rich-markdown/              # Rich markdown paragraphs with imagery
-├── tables/                     # Markdown table examples
-├── links/                      # Content with embedded links
-├── terminal-breaking-emoji/    # Complex emoji with modifiers
-└── international-text/         # Multilingual and multi-script content
-```
-
-#### Adding New Content
-
-**Code Blocks:** Add new files to the appropriate language directory under `test-content/code-blocks/`. Files should contain complete, runnable code examples with proper file extensions (`.py`, `.js`, `.sql`, etc.).
-
-**Long Responses:** Add `.txt` files to `test-content/long-responses/`. Each file should contain one coherent paragraph of 80-120 words.
-
-**Rich Markdown:** Add `.md` files to `test-content/rich-markdown/`. Each file should feature expressive paragraphs without tables or code fences, optionally including horizontal rules, images, and emoji for visual richness.
-
-**Tables:** Add `.md` files to `test-content/tables/`. Each file should contain one complete markdown table with headers and data.
-
-**Links:** Add content files to `test-content/links/`. Support plain URLs, markdown links, and table-embedded links.
-
-**Terminal-Breaking Emoji:** Add `.md` files to `test-content/terminal-breaking-emoji/`. Content should include complex emoji with skin tone modifiers, ZWJ sequences, multi-person groupings, keycap sequences, and flag tags to stress-test terminal rendering.
-
-**International Text:** Add `.md` files to `test-content/international-text/`. Include content in various scripts (CJK, Arabic, Hebrew, Devanagari, Thai, Cyrillic, etc.) with bidirectional text, multiple number systems, and mixed-script tables.
-
-#### Configuration
-
-The `test-content/config.toml` file controls content categories, command mappings, and system settings. The system automatically discovers new content files without requiring configuration changes.
-
-#### File Organization Standards
-
-- Use descriptive filenames that indicate the content purpose
-- Maintain consistent file extensions for each content type
-- Organize code blocks by programming language
-- Keep content files focused on single examples or concepts
-- Ensure all content is properly formatted and readable
-
-## Project Structure
-
-The server is organized into focused, single-responsibility modules:
-
-- **`index.js`** - Main entry point, starts the server
-- **`server.js`** - HTTP server logic and API endpoints  
-- **`eliza-bot.js`** - ELIZA chatbot implementation using ContentManager
-- **`lib/content-manager.js`** - Content loading and management system
-- **`lib/config-loader.js`** - TOML configuration file handling
-- **`test-content/`** - Filesystem-based content organization
-  - **`config.toml`** - Content system configuration
-  - **`code-blocks/`** - Programming language examples by language
-  - **`long-responses/`** - Extended paragraph content files
-  - **`rich-markdown/`** - Rich markdown paragraphs with imagery and emoji
-  - **`tables/`** - Markdown table examples
-  - **`links/`** - Content with various link formats
-  - **`terminal-breaking-emoji/`** - Complex emoji with modifiers and ZWJ sequences
-  - **`international-text/`** - Multilingual content with diverse scripts
-
 ## Development
 
-### Dependencies
-
 The server uses minimal dependencies:
+
 - **`smol-toml`** - TOML configuration file parsing
 - Node.js built-in modules (`http`, `url`, `fs`, `path`)
 
-### Modifying Content
+### Testing
+
+To run the test suite:
+
+```bash
+npm test
+```
+
+You can also run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+### Modifying the Server
 
 **ELIZA Patterns:** Edit the `patterns` array in the `ElizaBot` class within `eliza-bot.js`.
 
-**Test Content:** Add files to appropriate directories under `test-content/`. The system automatically discovers and loads new content.
+**Test Content:** Add files to appropriate directories under `test-content/`. For detailed information, see the [Content Management Guide](CONTENT_MANAGEMENT.md).
 
 **API Endpoints:** Modify the request handling logic in `server.js`.
 

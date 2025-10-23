@@ -6,27 +6,24 @@ This guide explains how to manage test content in the ELIZA chatbot server's fil
 
 The content management system allows server developers to add new test content by simply adding files to organized directories. The system automatically discovers and loads content without requiring code changes or server restarts.
 
-## Directory Structure
+## Project Structure
 
-```
-test-content/
-├── config.toml                 # Configuration file
-├── code-blocks/                # Programming examples
-│   ├── python/                 # *.py files
-│   ├── javascript/             # *.js files  
-│   ├── sql/                    # *.sql files
-│   ├── bash/                   # *.sh files
-│   ├── html/                   # *.html files
-│   ├── css/                    # *.css files
-│   ├── java/                   # *.java files
-│   ├── cpp/                    # *.cpp files
-│   ├── go/                     # *.go files
-│   └── rust/                   # *.rs files
-├── long-responses/             # *.txt files
-├── rich-markdown/              # *.md files with rich markdown paragraphs
-├── tables/                     # *.md files
-└── links/                      # *.txt, *.md files
-```
+The server is organized into focused, single-responsibility modules:
+
+- **`index.js`** - Main entry point, starts the server
+- **`server.js`** - HTTP server logic and API endpoints
+- **`eliza-bot.js`** - ELIZA chatbot implementation using ContentManager
+- **`lib/content-manager.js`** - Content loading and management system
+- **`lib/config-loader.js`** - TOML configuration file handling
+- **`test-content/`** - Filesystem-based content organization
+  - **`config.toml`** - Content system configuration
+  - **`code-blocks/`** - Programming language examples by language
+  - **`long-responses/`** - Extended paragraph content files
+  - **`rich-markdown/`** - Rich markdown paragraphs with imagery and emoji
+  - **`tables/`** - Markdown table examples
+  - **`links/`** - Content with various link formats
+  - **`terminal-breaking-emoji/`** - Complex emoji with modifiers and ZWJ sequences
+  - **`international-text/`** - Multilingual content with diverse scripts
 
 ## Adding New Content
 
@@ -124,6 +121,26 @@ Add table examples to `test-content/tables/` as `.md` files.
 
 Add content with embedded links to `test-content/links/`.
 
+**File Requirements:**
+- Mix of plain URLs and markdown links
+- Contextual, engaging content
+- Various complexity levels
+- Support for `.txt` and `.md` formats
+
+**Example - Adding a links file:**
+
+```bash
+# Create: test-content/links/web-history.md
+```
+
+```markdown
+The evolution of the web represents one of humanity's greatest collaborative achievements. Tim Berners-Lee's original vision at https://www.w3.org/History/1989/proposal.html laid the foundation for what would become the World Wide Web.
+
+The early days were marked by simple HTML pages, but visionaries like [Ted Nelson](https://en.wikipedia.org/wiki/Ted_Nelson) had already imagined hypertext systems decades earlier. His Xanadu project, while never fully realized, influenced countless developers and thinkers.
+
+Today's web bears little resemblance to those early static pages. Modern frameworks, APIs, and interactive applications have created an ecosystem that would astound the pioneers. Yet the fundamental principles—open standards, universal access, and interconnected information—remain as relevant as ever.
+```
+
 ### Rich Markdown Paragraphs
 
 Add expressive markdown paragraphs to `test-content/rich-markdown/` as `.md` files.
@@ -149,29 +166,19 @@ Money tiptoes through midnight like it owns the dark, jingling just loudly enoug
 It promises dreams are on sale in aisle seven, provided you remember your loyalty card.
 ```
 
-**File Requirements:**
-- Mix of plain URLs and markdown links
-- Contextual, engaging content
-- Various complexity levels
-- Support for `.txt` and `.md` formats
+### Terminal-Breaking Emoji
 
-**Example - Adding a links file:**
+Add `.md` files to `test-content/terminal-breaking-emoji/`. Content should include complex emoji with skin tone modifiers, ZWJ sequences, multi-person groupings, keycap sequences, and flag tags to stress-test terminal rendering.
 
-```bash
-# Create: test-content/links/web-history.md
-```
+### International Text
 
-```markdown
-The evolution of the web represents one of humanity's greatest collaborative achievements. Tim Berners-Lee's original vision at https://www.w3.org/History/1989/proposal.html laid the foundation for what would become the World Wide Web. 
+Add `.md` files to `test-content/international-text/`. Include content in various scripts (CJK, Arabic, Hebrew, Devanagari, Thai, Cyrillic, etc.) with bidirectional text, multiple number systems, and mixed-script tables.
 
-The early days were marked by simple HTML pages, but visionaries like [Ted Nelson](https://en.wikipedia.org/wiki/Ted_Nelson) had already imagined hypertext systems decades earlier. His Xanadu project, while never fully realized, influenced countless developers and thinkers.
+## Configuration
 
-Today's web bears little resemblance to those early static pages. Modern frameworks, APIs, and interactive applications have created an ecosystem that would astound the pioneers. Yet the fundamental principles—open standards, universal access, and interconnected information—remain as relevant as ever.
-```
+The `test-content/config.toml` file controls content categories, command mappings, and system settings. The system automatically discovers new content files without requiring configuration changes.
 
-## Configuration Options
-
-The `test-content/config.toml` file controls system behavior:
+### Configuration Options
 
 ```toml
 [content]
@@ -235,26 +242,13 @@ languages = ["python", "javascript"]  # Only these languages will be used
 code_single = "#"  # Changes @ command to # command
 ```
 
-## File Naming Conventions
+## File Organization Standards
 
-### Code Blocks
-- Use descriptive names: `fibonacci.py`, `async-fetch.js`, `user-authentication.sql`
-- Avoid spaces: use hyphens or underscores
-- Include the purpose: `thread-safe-queue.cpp`, `responsive-grid.html`
-
-### Long Responses  
-- Describe the topic: `ai-consciousness.txt`, `digital-archaeology.txt`
-- Use hyphens for multi-word topics
-- Keep names concise but descriptive
-
-### Tables
-- Indicate the data type: `performance-metrics.md`, `api-endpoints.md`
-- Use plural forms when appropriate
-- Describe the table's purpose clearly
-
-### Links
-- Indicate complexity: `simple-links.txt`, `complex-links.md`
-- Describe the content theme: `web-history.md`, `technology-trends.txt`
+- Use descriptive filenames that indicate the content purpose
+- Maintain consistent file extensions for each content type
+- Organize code blocks by programming language
+- Keep content files focused on single examples or concepts
+- Ensure all content is properly formatted and readable
 
 ## Troubleshooting
 
