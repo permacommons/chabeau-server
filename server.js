@@ -1,6 +1,10 @@
 import http from 'http';
 import url from 'url';
+import fs from 'fs';
 import { ElizaBot } from './eliza-bot.js';
+
+// Create a write stream for logging
+const logStream = fs.createWriteStream('eliza.log', { flags: 'a' });
 
 // Initialize ELIZA bot
 const eliza = new ElizaBot();
@@ -124,6 +128,11 @@ function createServer(port = 3000) {
     const path = parsedUrl.pathname;
     const method = req.method;
 
+    // Log the request
+    const logEntry = `[${new Date().toISOString()}] ${method} ${path}\nHeaders: ${JSON.stringify(req.headers, null, 2)}\n`;
+    logStream.write('----------------------------------------------------------------------\n');
+    logStream.write(logEntry);
+
     // Handle CORS preflight requests
     if (method === 'OPTIONS') {
       res.writeHead(200, {
@@ -208,6 +217,9 @@ function createServer(port = 3000) {
             const requestData = JSON.parse(body);
             const messages = requestData.messages || [];
             const stream = requestData.stream || false;
+
+            // Log the request body
+            logStream.write(`Body: ${JSON.stringify(requestData, null, 2)}\n`);
 
             // Get the last user message
             const lastMessage = messages.filter(msg => msg.role === 'user').pop();
